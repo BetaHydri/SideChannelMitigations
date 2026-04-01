@@ -18,6 +18,8 @@
     Write-Host $script:PlatformInfo.Type -ForegroundColor White
     Write-Host "CPU:         " -NoNewline
     Write-Host $script:PlatformInfo.Details['CPUModel'] -ForegroundColor White
+    Write-Host "Architecture:" -NoNewline
+    Write-Host $script:PlatformInfo.Details['CpuArchitecture'] -ForegroundColor White
     Write-Host "OS:          " -NoNewline
     Write-Host "$($script:PlatformInfo.Details['OSVersion']) (Build $($script:PlatformInfo.Details['OSBuild']))" -ForegroundColor White
 
