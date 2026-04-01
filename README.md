@@ -440,8 +440,8 @@ The tool automatically detects your platform and only evaluates **applicable mit
 
 | Mitigation | Physical | Hyper-V<br>Host | Hyper-V<br>Guest | VMware<br>Guest | ESXi/vSphere<br>Host | Notes |
 |:-----------|:--------:|:---------------:|:----------------:|:---------------:|:--------------------:|:------|
-| **SSBD** (Speculative Store Bypass) | ✅ | ✅ | ✅ | ✅ | ⚠️ | Windows only; ESXi via vSphere |
-| **BTI** (Branch Target Injection) | ✅ | ✅ | ✅ | ✅ | ⚠️ | Windows only; ESXi via vSphere |
+| **SSBD** (Speculative Store Bypass) | ✅ | ✅ | ✅ | ✅ | ⚠️ | x86/x64 only; ARM64 uses firmware mitigation |
+| **BTI** (Branch Target Injection) | ✅ | ✅ | ✅ | ✅ | ⚠️ | x86/x64 only; ARM64 uses firmware mitigation |
 | **KVAS** (Kernel VA Shadowing) | ✅ | ✅ | ✅ | ✅ | ⚠️ | Windows only; ESXi via vSphere |
 | **MDS** (Microarchitectural Data Sampling) | ✅ | ✅ | ✅ | ✅ | ⚠️ | Windows only; ESXi via vSphere |
 | **TAA** (TSX Asynchronous Abort) | ✅ | ✅ | ✅ | ✅ | ⚠️ | Windows only; ESXi via vSphere |
@@ -465,6 +465,17 @@ The tool automatically detects your platform and only evaluates **applicable mit
 - ✅ = Supported and assessed by this tool
 - ❌ = Not applicable to this platform
 - ⚠️ = Cannot run PowerShell script (configure via vSphere client)
+
+> **💻 ARM64 Note:** On ARM64 systems (e.g., Qualcomm Snapdragon,
+> Microsoft SQ, Ampere), the registry-based mitigations for SSBD
+> (CVE-2018-3639), SSBD Feature Mask, and BTI (CVE-2017-5715) are
+> **automatically skipped**. These vulnerabilities exist on ARM
+> processors but are mitigated at the **firmware level**
+> (`SMCCC_ARCH_WORKAROUND_1` for Spectre v2,
+> `SMCCC_ARCH_WORKAROUND_2` for SSBD) rather than via Windows
+> registry keys. See
+> [Arm Spectre/Meltdown Security Bulletin](https://developer.arm.com/Arm%20Security%20Center/Speculative%20Processor%20Vulnerability)
+> for details.
 
 **Platform-Specific Behavior:**
 - **Windows platforms** (Physical, Hyper-V, VMware Guest): Script runs directly and assesses applicable mitigations
@@ -1445,6 +1456,12 @@ MIT License
 - **[Spectre/Meltdown AMD Guidance](https://www.amd.com/en/resources/product-security/bulletin/amd-sb-1000.html)** - AMD-specific mitigations
 - **[IOMMU (AMD-Vi) Specification](https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/48882_IOMMU.pdf)** - AMD I/O Memory Management Unit
 
+#### Arm Security Documentation
+- **[Arm Spectre/Meltdown Security Bulletin](https://developer.arm.com/Arm%20Security%20Center/Speculative%20Processor%20Vulnerability)** - Affected ARM processors and firmware mitigations
+- **[Cache Speculation Side-channels White Paper](https://developer.arm.com/documentation/102816/)** - ARM cache timing side-channel analysis
+- **[Spectre-BHB White Paper](https://developer.arm.com/documentation/102898/0107/)** - Branch History Injection on ARM
+- **[SMC Calling Convention (SMCCC)](https://developer.arm.com/documentation/den0028/latest)** - Firmware workaround interface (WORKAROUND_1, WORKAROUND_2, WORKAROUND_3)
+
 ### CVE Databases & Tracking
 
 #### NIST National Vulnerability Database
@@ -1557,7 +1574,8 @@ Windows Update → Check for updates → Install all available updates
 - **Intel CPUs**: May need microcode updates from Windows Update or BIOS updates
 - **Older CPUs**: Some CPUs don't support these newer mitigations (hardware limitation)
 - **Virtual Machines**: Host must have mitigations enabled first (see HYPERVISOR_CONFIGURATION.md)
-- **AMD/ARM CPUs**: Automatically marked as "Hardware Immune" (Intel-specific vulnerabilities)
+- **AMD CPUs**: Automatically marked as "Hardware Immune" for Intel-specific vulnerabilities
+- **ARM64 CPUs**: Registry-based SSBD/BTI mitigations skipped (handled via firmware; see [Arm Security Bulletin](https://developer.arm.com/Arm%20Security%20Center/Speculative%20Processor%20Vulnerability))
 
 **Verification:**
 If Microsoft's `Get-SpeculationControlSettings` also shows "Windows OS support is enabled: **False**", then your hardware genuinely doesn't support these features or is missing required updates.
@@ -1623,7 +1641,7 @@ When running as a Hyper-V guest, the tool provides PowerShell commands to enable
 ### How to Use These Resources
 
 1. **Start with Microsoft KB4073119** - Primary reference for Windows mitigation implementation
-2. **Check your CPU vendor** (Intel/AMD) - Read vendor-specific guidance for your hardware
+2. **Check your CPU vendor** (Intel/AMD/ARM) - Read vendor-specific guidance for your hardware
 3. **Review CVE details** - Understand the specific vulnerabilities affecting your systems
 4. **Assess performance impact** - Use Microsoft/Red Hat studies to plan mitigation deployment
 5. **Validate with tools** - Cross-reference this module with Microsoft's SpeculationControl module
@@ -1631,7 +1649,7 @@ When running as a Hyper-V guest, the tool provides PowerShell commands to enable
 
 ---
 
-**Version:** 3.0.0  
-**Last Updated:** 2026-04-01  
+**Version:** 3.3.0  
+**Last Updated:** 2026-04-02  
 **PowerShell:** 5.1, 7.x  
-**Platform:** Windows 10/11, Server 2016+
+**Platform:** Windows 10/11, Server 2016+ (x86/x64; ARM64 with reduced scope)

@@ -36,13 +36,13 @@ CPU side-channel mitigations like PSDP (Predictive Store Forwarding Disable) wor
 
 Different mitigations require different CPU capabilities:
 
-| Mitigation | Required CPU Feature | Intel CPUs | AMD CPUs |
-|------------|---------------------|------------|----------|
-| **PSDP/BHI** | CPUID Bit for PSFD | 11th Gen+ | Zen 3+ |
-| **Retbleed** | Retpoline/IBRS support | Most modern | Zen 2+ |
-| **MMIO Stale Data** | FB_CLEAR, VERW | 10th Gen+ | N/A (Intel-specific) |
-| **Enhanced IBRS** | IBRS_ALL CPUID bit | 8th Gen+ (some), 10th Gen+ | Zen 3+ |
-| **SSBD** | SSBD CPUID bit | Most modern | Zen+ |
+| Mitigation | Required CPU Feature | Intel CPUs | AMD CPUs | ARM64 CPUs |
+|------------|---------------------|------------|----------|------------|
+| **PSDP/BHI** | CPUID Bit for PSFD | 11th Gen+ | Zen 3+ | N/A (firmware) |
+| **Retbleed** | Retpoline/IBRS support | Most modern | Zen 2+ | N/A |
+| **MMIO Stale Data** | FB_CLEAR, VERW | 10th Gen+ | N/A (Intel-specific) | N/A |
+| **Enhanced IBRS** | IBRS_ALL CPUID bit | 8th Gen+ (some), 10th Gen+ | Zen 3+ | N/A |
+| **SSBD** | SSBD CPUID bit | Most modern | Zen+ | N/A (firmware) |
 
 **The hypervisor must expose these CPUID bits and MSR (Model-Specific Register) access to the VM.**
 

@@ -25,9 +25,9 @@
             Description      = 'Prevents Speculative Store Bypass (Variant 4) attacks'
             Impact           = 'Low'
             Platform         = 'All'
-            Architecture     = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = 'SSBD'
-            Recommendation   = 'Intel CPUs: Set to 0x802048 (8396872) for Basic+BHI mitigations. AMD CPUs: Set to 0x2048 (8264) for Basic mitigations. Use bitwise OR (0x2048 | 0x800000 = 0x802048) to combine. Value 0 does NOT enable system-wide.'
+            Recommendation   = 'Intel CPUs: Set to 0x802048 (8396872) for Basic+BHI mitigations. AMD CPUs: Set to 0x2048 (8264) for Basic mitigations. Use bitwise OR (0x2048 | 0x800000 = 0x802048) to combine. Value 0 does NOT enable system-wide. ARM64 CPUs: Not applicable — mitigated via firmware (SMCCC_ARCH_WORKAROUND_2).'
             URL              = 'https://support.microsoft.com/en-us/topic/kb4072698-windows-server-and-azure-stack-hci-guidance-to-protect-against-silicon-based-microarchitectural-and-speculative-execution-side-channel-vulnerabilities-2f965763-00e2-8f98-b632-0d96f30c8c8e'
         },
         @{
@@ -41,9 +41,9 @@
             Description      = 'Required companion setting for SSBD'
             Impact           = 'Low'
             Platform         = 'All'
-            Architecture     = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = $null
-            Recommendation   = 'Must be enabled for SSBD to function'
+            Recommendation   = 'Must be enabled for SSBD to function (x86/x64 only; ARM64 uses firmware-based mitigation)'
             URL              = 'https://nvd.nist.gov/vuln/detail/CVE-2018-3639'
         },
         @{
@@ -57,9 +57,9 @@
             Description      = 'Mitigates Spectre Variant 2 attacks'
             Impact           = 'Low'
             Platform         = 'All'
-            Architecture     = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = 'BTI'
-            Recommendation   = 'Essential protection against Spectre v2'
+            Recommendation   = 'Essential protection against Spectre v2 (x86/x64 only; ARM64 uses firmware-based mitigation via SMCCC_ARCH_WORKAROUND_1)'
             URL              = 'https://nvd.nist.gov/vuln/detail/CVE-2017-5715'
         },
         @{
