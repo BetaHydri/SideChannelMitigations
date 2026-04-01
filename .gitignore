@@ -1,3 +1,16 @@
+# Sampler build output
+output/
+
+# PowerShell module artifacts
+*.nupkg
+
+# IDE
+*.code-workspace
+
+# OS
+Thumbs.db
+.DS_Store
+
 # Log files
 v1/Logs/
 v2/Logs/
