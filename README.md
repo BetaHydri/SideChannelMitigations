@@ -1649,7 +1649,7 @@ When running as a Hyper-V guest, the tool provides PowerShell commands to enable
 
 ---
 
-**Version:** 3.3.0  
+**Version:** 3.3.1  
 **Last Updated:** 2026-04-02  
 **PowerShell:** 5.1, 7.x  
 **Platform:** Windows 10/11, Server 2016+ (x86/x64; ARM64 with reduced scope)

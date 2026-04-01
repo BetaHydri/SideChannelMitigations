@@ -5,22 +5,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.3.0] - 2026-04-02
+## [3.3.1] - 2026-04-02
 
-### Added
-
-- ARM64 CPU architecture detection in `Initialize-PlatformDetection`.
-- Architecture-based filtering in `Get-SideChannelMitigationDefinition` to skip
-  x86-only mitigations on ARM64 systems.
-- ARM64 architecture display in `Show-PlatformInfo` and assessment output.
-- Arm Security Documentation section in README with links to Arm
-  Spectre/Meltdown bulletin, cache speculation white paper, Spectre-BHB
-  white paper, and SMCCC specification.
-
-### Changed
+### Fixed
 
 - Changed `Architecture` for SSBD (CVE-2018-3639), SSBD Feature Mask, and
-  BTI (CVE-2017-5715) from `'All'` to `'x86'`. The Windows registry-based
+  BTI (CVE-2017-5715) from `'All'` to `'x86'` to eliminate false-positive
+  "Yes - Critical" alerts on ARM64 systems. The Windows registry-based
   mitigations (`FeatureSettingsOverride`, `FeatureSettingsOverrideMask`,
   `DisablePageCombining`) are x86/x64-specific mechanisms. ARM64 CPUs
   mitigate these vulnerabilities via firmware (`SMCCC_ARCH_WORKAROUND_1`,
@@ -30,13 +21,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [Microsoft KB4072698](https://support.microsoft.com/en-us/topic/kb4072698).
 - Updated Platform Support Matrix in README with x86/x64 architecture notes
   for SSBD and BTI.
+
+### Added
+
+- Arm Security Documentation section in README with links to Arm
+  Spectre/Meltdown bulletin, cache speculation white paper, Spectre-BHB
+  white paper, and SMCCC specification.
+- ARM64 column in HYPERVISOR_CONFIGURATION.md CPU features table.
 - Updated vendor guidance in README to include ARM alongside Intel/AMD.
 
-## [3.2.0] - 2026-04-02
+## [3.3.0] - 2026-04-02
 
-### Fixed
+### Added
 
-- Resolved module-scope variable bugs from monolithic migration.
+- ARM64 CPU architecture detection in `Initialize-PlatformDetection`.
+- Architecture-based filtering in `Get-SideChannelMitigationDefinition` to skip
+  x86-only mitigations on ARM64 systems.
+- ARM64 architecture display in `Show-PlatformInfo` and assessment output.
 
 ## [3.1.0] - 2026-04-01
 
