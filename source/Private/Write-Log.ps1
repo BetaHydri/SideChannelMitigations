@@ -37,7 +37,7 @@
 
     # Write to log file
     try {
-        Add-Content -Path $LogPath -Value $logEntry -Encoding UTF8 -ErrorAction SilentlyContinue
+        Add-Content -Path $script:LogPath -Value $logEntry -Encoding UTF8 -ErrorAction SilentlyContinue
     }
     catch {
         Write-Debug "Log write failed: $($_.Exception.Message)"

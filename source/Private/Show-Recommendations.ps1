@@ -100,5 +100,5 @@
     }
 
     Write-Host "`nTo apply mitigations, run:" -ForegroundColor Cyan
-    Write-Host "   .\SideChannel_Check_v2.ps1 -Mode ApplyInteractive" -ForegroundColor White
+    Write-Host "   Invoke-SideChannelAssessment -Mode ApplyInteractive" -ForegroundColor White
 }

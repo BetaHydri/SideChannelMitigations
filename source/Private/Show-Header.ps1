@@ -14,7 +14,7 @@
     $header = @"
 
 ================================================================================
-  Side-Channel Vulnerability Mitigation Tool - Version $script:Version
+  Side-Channel Vulnerability Mitigation Tool - Version $script:ModuleVersion
 ================================================================================
 
 "@
