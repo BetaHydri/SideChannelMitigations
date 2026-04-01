@@ -5,6 +5,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-04-02
+
+### Added
+
+- ARM64 CPU architecture detection in `Initialize-PlatformDetection`.
+- Architecture-based filtering in `Get-SideChannelMitigationDefinition` to skip
+  x86-only mitigations on ARM64 systems.
+- ARM64 architecture display in `Show-PlatformInfo` and assessment output.
+
+## [3.2.0] - 2026-04-02
+
+### Fixed
+
+- Resolved module-scope variable bugs from monolithic migration.
+
+## [3.1.0] - 2026-04-01
+
+### Changed
+
+- `LogPath` parameter now accepts a folder path only; log filename is auto-generated.
+- Expanded test coverage for logging functions.
+
+### Fixed
+
+- Refactored README for module-first documentation and corrected module references.
+
 ## [3.0.0] - 2026-04-01
 
 ### Changed
