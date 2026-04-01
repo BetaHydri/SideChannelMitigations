@@ -1,9 +1,10 @@
 # SideChannelMitigations
 
+[![PSGallery Version](https://img.shields.io/powershellgallery/v/SideChannelMitigations?include_prereleases&label=PSGallery)](https://www.powershellgallery.com/packages/SideChannelMitigations)
+[![PSGallery Downloads](https://img.shields.io/powershellgallery/dt/SideChannelMitigations)](https://www.powershellgallery.com/packages/SideChannelMitigations)
 [![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B%20%7C%207.x-5391FE?logo=powershell&logoColor=white)](https://github.com/PowerShell/PowerShell)
 [![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?logo=windows&logoColor=white)](https://www.microsoft.com/windows)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-3.0.0-blue.svg)](https://github.com/BetaHydri/SideChannelMitigations/releases)
 [![Maintained](https://img.shields.io/badge/Maintained-Yes-brightgreen.svg)](https://github.com/BetaHydri/SideChannelMitigations/graphs/commit-activity)
 
 ## 📖 Overview
@@ -60,7 +61,6 @@
 - ✅ **WhatIf preview** for all modification operations
 - ✅ **CSV export** for reporting and documentation
 - ✅ **Microcode detection** - alerts when BIOS updates are needed
-- ✅ **No external dependencies** - pure PowerShell, no modules required
 - ✅ **Comprehensive logging** - full audit trail of all operations
 - ✅ **MIT licensed** - free for personal and commercial use
 
@@ -68,42 +68,7 @@
 
 ## 🎯 Features
 
-### New in v2.3.0
-- **🔄 BREAKING CHANGE: Intuitive Mode Names** - Renamed modes to match their behavior
-- **`RevertInteractive` → `Revert`** - Quick restore of latest backup (no interaction needed)
-- **`Restore` → `RestoreInteractive`** - Browse backups and selectively restore (full interaction)
-- **✨ Clearer Workflow** - "Interactive" now means you make choices, not just confirm
-
-### Previous Update (v2.2.0)
-- **⚠️ Microcode Detection** - Automatically detects when registry is set but CPU microcode updates are missing
-- **🔴 Critical Highlighting** - SBDR and PSDP upgraded to Critical category with bright red alerts
-- **📊 Enhanced Status** - "Inactive (Microcode Update Required)" status shows exact issue
-- **💡 Actionable Guidance** - Specific steps for BIOS/UEFI firmware updates
-
-### Previous Fixes (v2.1.9)
-- **🔧 SSBD Detection Fixed** - FeatureSettingsOverride now uses Microsoft KB4072698 documented values
-- **✅ Intel CPU Support** - Recommends 0x802048 (Basic + BHI combined) for Intel CPUs
-- **✅ AMD CPU Support** - Recommends 0x2048 (Basic only) for AMD CPUs
-- **🎯 Microsoft Alignment** - Accepts only documented values: 0x2048, 0x800000, 0x802048
-
-### Previous Fixes (v2.1.7-v2.1.8)
-- **🔧 CRITICAL BUG FIX** - Corrected all kernel API flag bitmasks (v2.1.6 had completely wrong values)
-- **✅ KVAS Detection Fixed** - Now correctly shows "Not Needed (HW Immune)" for Meltdown-immune CPUs (Tiger Lake, Ice Lake, etc.)
-- **🎯 Microsoft Alignment** - All flag detection now matches Microsoft's SpeculationControl module exactly
-
-### Major Enhancements (v2.1.6)
-- **🔬 Hardware-Based Detection** - Reads flags2 from Windows kernel API for SBDR/FBSDP/PSDP
-- **🎯 Microsoft SpeculationControl Alignment** - Detection logic matches Microsoft's official module
-- **🛡️ Comprehensive Coverage** - 31 mitigations (added FBSDP) + 5 hardware prerequisites
-- **✨ Simplified Mode Structure** - Dedicated modes replace parameter combinations
-- **🎯 Selective Apply & Restore** - Choose [R]ecommended or [A]ll mitigations; restore [A]ll or [S]elective items
-- **🔍 Hardware Detection** - Automatic detection of UEFI, Secure Boot, TPM 2.0, VT-x, IOMMU
-- **📊 Intelligent Scoring** - Visual security score bar (█░) with smart filtering
-- **💾 Advanced Backup System** - Selective restoration with hardware-only filtering
-- **👁️ WhatIf Support** - Preview all changes before applying
-- **🎨 Enhanced Visual Output** - Block characters, educational detailed view
-- **🖥️ Platform-Aware** - Automatically adapts to Physical/Hyper-V/VMware environments
-- **🔧 PS 5.1 & 7.x Compatible** - Runtime Unicode generation for cross-version compatibility
+For a detailed version history, see the [CHANGELOG](CHANGELOG.md).
 
 ## 🚀 Quick Start
 
@@ -122,29 +87,48 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 > and restarted before CPU-specific features (PSDP, Retbleed, MMIO) will work in the guest VM.
 > See [`HYPERVISOR_CONFIGURATION.md`](HYPERVISOR_CONFIGURATION.md) for complete setup instructions.
 
+### Installation
+
+```powershell
+# Install preview from PSGallery
+Install-Module -Name SideChannelMitigations -AllowPrerelease -Scope CurrentUser
+
+# Import after installation
+Import-Module SideChannelMitigations
+```
+
+**Or build from source:**
+
+```powershell
+git clone https://github.com/BetaHydri/SideChannelMitigations.git
+Set-Location SideChannelMitigations
+.\build.ps1
+Import-Module ./output/module/SideChannelMitigations
+```
+
 ### Basic Usage
 
 ```powershell
 # 1. Assessment (default mode) - Check current security status
-.\SideChannel_Check_v2.ps1
+Invoke-SideChannelAssessment
 
 # 2. Detailed educational view - Learn about CVEs and impacts
-.\SideChannel_Check_v2.ps1 -ShowDetails
+Invoke-SideChannelAssessment -ShowDetails
 
 # 3. Apply mitigations interactively - Harden your system (auto-backup created)
-.\SideChannel_Check_v2.ps1 -Mode ApplyInteractive
+Invoke-SideChannelAssessment -Mode ApplyInteractive
 
 # 4. Preview changes first - See what will change before applying
-.\SideChannel_Check_v2.ps1 -Mode ApplyInteractive -WhatIf
+Invoke-SideChannelAssessment -Mode ApplyInteractive -WhatIf
 
 # 5. Quick undo - Revert to most recent backup instantly
-.\SideChannel_Check_v2.ps1 -Mode Revert
+Invoke-SideChannelAssessment -Mode Revert
 
 # 6. Advanced recovery - Browse backups, restore selectively
-.\SideChannel_Check_v2.ps1 -Mode RestoreInteractive
+Invoke-SideChannelAssessment -Mode RestoreInteractive
 
 # 7. Manual backup - Create checkpoint before risky changes
-.\SideChannel_Check_v2.ps1 -Mode Backup
+Invoke-SideChannelAssessment -Mode Backup
 ```
 
 **When to use which mode:**
@@ -152,27 +136,12 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 - **ShowDetails** → Learning about vulnerabilities and recommendations
 - **ApplyInteractive** → Hardening system (backup auto-created)
 - **Revert** → Undo recent changes quickly (latest backup only)
-- **RestoreInteractive** → Browse all backups, selective restore, choose what to restore
-- **Backup** → Creating manual checkpoint (optional, ApplyInteractive auto-creates one)
+- **RestoreInteractive** → Browse all backups, selective restore,
+  choose what to restore
+- **Backup** → Creating manual checkpoint (optional,
+  ApplyInteractive auto-creates one)
 
 ---
-
-## � PowerShell Module Usage
-
-In addition to the standalone script, this project ships as a **Sampler-built PowerShell module** (`SideChannelMitigations`) that exposes five public functions for programmatic and pipeline-based workflows.
-
-### Installation
-
-```powershell
-# Install from PSGallery (stable)
-Install-Module -Name SideChannelMitigations -Scope CurrentUser
-
-# Install preview version
-Install-Module -Name SideChannelMitigations -AllowPrerelease -Scope CurrentUser
-
-# Import after installation
-Import-Module SideChannelMitigations
-```
 
 ### Exported Functions
 
@@ -387,16 +356,16 @@ Evaluate current security posture without making changes.
 
 ```powershell
 # Standard assessment
-.\SideChannel_Check_v2.ps1
+Invoke-SideChannelAssessment
 
 # With detailed educational output
-.\SideChannel_Check_v2.ps1 -ShowDetails
+Invoke-SideChannelAssessment -ShowDetails
 
 # Export results to CSV
-.\SideChannel_Check_v2.ps1 -ExportPath "C:\Reports"
+Invoke-SideChannelAssessment -ExportPath "C:\Reports"
 
 # Combine assessment with CSV export
-.\SideChannel_Check_v2.ps1 -ShowDetails -ExportPath "C:\Reports"
+Invoke-SideChannelAssessment -ShowDetails -ExportPath "C:\Reports"
 ```
 
 **Parameters:**
@@ -626,10 +595,10 @@ Interactively select and apply security mitigations with two selection modes.
 
 ```powershell
 # Interactive application
-.\SideChannel_Check_v2.ps1 -Mode ApplyInteractive
+Invoke-SideChannelAssessment -Mode ApplyInteractive
 
 # Preview changes first (recommended)
-.\SideChannel_Check_v2.ps1 -Mode ApplyInteractive -WhatIf
+Invoke-SideChannelAssessment -Mode ApplyInteractive -WhatIf
 ```
 
 **Selection Modes:**
@@ -637,13 +606,13 @@ Interactively select and apply security mitigations with two selection modes.
 - **[A] All Mitigations** - Shows all 24+ available mitigations for selective hardening
 
 **Recommended Workflow:**
-1. Run detailed assessment: `.\SideChannel_Check_v2.ps1 -ShowDetails`
+1. Run detailed assessment: `Invoke-SideChannelAssessment -ShowDetails`
 2. Review CVEs, descriptions, impacts, and recommendations
-3. **Create manual backup:** `.\SideChannel_Check_v2.ps1 -Mode Backup` (recommended before any changes)
+3. **Create manual backup:** `Invoke-SideChannelAssessment -Mode Backup` (recommended before any changes)
 4. Use ApplyInteractive with mode [A] to selectively enable mitigations
 5. Make informed decisions based on your security requirements
 6. Restart system to activate changes
-7. **If needed, restore from backup:** `.\.\SideChannel_Check_v2.ps1 -Mode Revert` (latest) or `-Mode RestoreInteractive` (browse backups)
+7. **If needed, restore from backup:** `.\Invoke-SideChannelAssessment -Mode Revert` (latest) or `-Mode RestoreInteractive` (browse backups)
 
 **Features:**
 - ✅ Automatic backup creation before changes (ApplyInteractive mode)
@@ -676,10 +645,10 @@ Your selection: critical     # Selects only critical items
 
 ```powershell
 # Revert to last backup
-.\SideChannel_Check_v2.ps1 -Mode Revert
+Invoke-SideChannelAssessment -Mode Revert
 
 # Preview revert operation
-.\SideChannel_Check_v2.ps1 -Mode Revert -WhatIf
+Invoke-SideChannelAssessment -Mode Revert -WhatIf
 ```
 
 **When to use:**
@@ -702,10 +671,10 @@ Your selection: critical     # Selects only critical items
 
 ```powershell
 # Create backup
-.\SideChannel_Check_v2.ps1 -Mode Backup
+Invoke-SideChannelAssessment -Mode Backup
 
 # Preview backup operation
-.\SideChannel_Check_v2.ps1 -Mode Backup -WhatIf
+Invoke-SideChannelAssessment -Mode Backup -WhatIf
 ```
 
 **When to use:**
@@ -729,7 +698,7 @@ Your selection: critical     # Selects only critical items
 
 ```powershell
 # Interactive restore
-.\SideChannel_Check_v2.ps1 -Mode RestoreInteractive
+Invoke-SideChannelAssessment -Mode RestoreInteractive
 ```
 
 **When to use:**
@@ -791,11 +760,11 @@ Skipped (hardware-only): 3
 
 ## 🔍 Comprehensive Assessment Output
 
-### Sample Output - v2.1.1
+### Sample Output
 
 ```
 ================================================================================
-  Side-Channel Vulnerability Mitigation Tool - Version 2.1.1
+  SideChannelMitigations - Version 3.0.0
 ================================================================================
 
 [Debug] Detecting platform type...
@@ -900,10 +869,10 @@ IOMMU/VT-d Support             Prerequisite Protected    DMA Protection         
 
 ```
 ================================================================================
-  Side-Channel Vulnerability Mitigation Tool - Version 2.1.1
+  SideChannelMitigations - Version 3.0.0
 ================================================================================
 
-.\SideChannel_Check_v2.ps1 -Mode ApplyInteractive
+Invoke-SideChannelAssessment -Mode ApplyInteractive
 
 === Interactive Mitigation Application ===
 Select mitigations to apply (or 'all' for recommended, 'critical' for critical only)
@@ -942,10 +911,10 @@ Backup saved: C:\...\Backups\Backup_20251126_153045.json
 
 ```
 ================================================================================
-  Side-Channel Vulnerability Mitigation Tool - Version 2.1.1
+  SideChannelMitigations - Version 3.0.0
 ================================================================================
 
-.\SideChannel_Check_v2.ps1 -Mode ApplyInteractive -WhatIf
+Invoke-SideChannelAssessment -Mode ApplyInteractive -WhatIf
 
 === Interactive Mitigation Application ===
 [WhatIf Mode] Changes will be previewed but not applied
@@ -979,10 +948,10 @@ System restart would be required: Yes
 ### Sample Output - Backup Mode
 
 ```
-.\SideChannel_Check_v2.ps1 -Mode Backup
+Invoke-SideChannelAssessment -Mode Backup
 
 ================================================================================
-  Side-Channel Vulnerability Mitigation Tool - Version 2.1.1
+  SideChannelMitigations - Version 3.0.0
 ================================================================================
 
 [Debug] Detecting platform type...
@@ -1013,7 +982,7 @@ Mitigations: 21
 
 **Backup with WhatIf Preview:**
 ```
-.\SideChannel_Check_v2.ps1 -Mode Backup -WhatIf
+Invoke-SideChannelAssessment -Mode Backup -WhatIf
 
 === Create Configuration Backup ===
 
@@ -1030,10 +999,10 @@ Would save to: C:\...\Backups\Backup_<timestamp>.json
 ### Sample Output - RestoreInteractive Mode
 
 ```
-.\SideChannel_Check_v2.ps1 -Mode RestoreInteractive
+Invoke-SideChannelAssessment -Mode RestoreInteractive
 
 ================================================================================
-  Side-Channel Vulnerability Mitigation Tool - Version 2.1.1
+  SideChannelMitigations - Version 3.0.0
 ================================================================================
 
 --- Platform Information ---
@@ -1089,10 +1058,10 @@ Skipped (hardware-only): 3
 ### Sample Output - Revert Mode
 
 ```
-.\SideChannel_Check_v2.ps1 -Mode Revert
+Invoke-SideChannelAssessment -Mode Revert
 
 ================================================================================
-  Side-Channel Vulnerability Mitigation Tool - Version 2.1.1
+  SideChannelMitigations - Version 3.0.0
 ================================================================================
 
 --- Platform Information ---
@@ -1126,10 +1095,10 @@ Skipped (hardware-only): 3
 ### Sample Output - CSV Export
 
 ```
-.\SideChannel_Check_v2.ps1 -ExportPath "C:\Reports"
+Invoke-SideChannelAssessment -ExportPath "C:\Reports"
 
 ================================================================================
-  Side-Channel Vulnerability Mitigation Tool - Version 2.1.1
+  SideChannelMitigations - Version 3.0.0
 ================================================================================
 
 [Assessment runs normally...]
@@ -1228,7 +1197,7 @@ When Enhanced IBRS shows "Active," only the BTI/Spectre v2 vulnerability is prot
 
 #### Test 1: Basic Assessment
 ```powershell
-.\SideChannel_Check_v2.ps1
+Invoke-SideChannelAssessment
 
 # Expected: 
 # ✅ No errors or exceptions
@@ -1239,7 +1208,7 @@ When Enhanced IBRS shows "Active," only the BTI/Spectre v2 vulnerability is prot
 
 #### Test 2: WhatIf Preview
 ```powershell
-.\SideChannel_Check_v2.ps1 -Mode ApplyInteractive -WhatIf
+Invoke-SideChannelAssessment -Mode ApplyInteractive -WhatIf
 
 # Expected:
 # ✅ No registry changes made
@@ -1249,7 +1218,7 @@ When Enhanced IBRS shows "Active," only the BTI/Spectre v2 vulnerability is prot
 
 #### Test 3: Interactive Apply
 ```powershell
-.\SideChannel_Check_v2.ps1 -Mode ApplyInteractive
+Invoke-SideChannelAssessment -Mode ApplyInteractive
 # Select: 1,2
 
 # Expected:
@@ -1262,10 +1231,10 @@ When Enhanced IBRS shows "Active," only the BTI/Spectre v2 vulnerability is prot
 #### Test 4: Backup & Restore
 ```powershell
 # Create backup
-.\SideChannel_Check_v2.ps1 -Mode Backup
+Invoke-SideChannelAssessment -Mode Backup
 
 # Browse backups
-.\SideChannel_Check_v2.ps1 -Mode Restore
+Invoke-SideChannelAssessment -Mode RestoreInteractive
 
 # Expected:
 # ✅ Backup file created in .\Backups\
@@ -1275,7 +1244,7 @@ When Enhanced IBRS shows "Active," only the BTI/Spectre v2 vulnerability is prot
 
 #### Test 5: WhatIf with Revert
 ```powershell
-.\SideChannel_Check_v2.ps1 -Mode RevertInteractive -WhatIf
+Invoke-SideChannelAssessment -Mode Revert -WhatIf
 
 # Expected:
 # ✅ Lists latest backup
@@ -1325,12 +1294,13 @@ When Enhanced IBRS shows "Active," only the BTI/Spectre v2 vulnerability is prot
 
 ### Recommended Workflow
 
-1. **Assessment** → `.\SideChannel_Check_v2.ps1`
-2. **Planning** → `.\SideChannel_Check_v2.ps1 -Mode ApplyInteractive -WhatIf`
-3. **Backup** → `.\SideChannel_Check_v2.ps1 -Mode Backup`
-4. **Apply** → `.\SideChannel_Check_v2.ps1 -Mode ApplyInteractive`
+1. **Assessment** → `Invoke-SideChannelAssessment`
+2. **Planning** → `Invoke-SideChannelAssessment -Mode ApplyInteractive -WhatIf`
+3. **Backup** → `Invoke-SideChannelAssessment -Mode Backup`
+4. **Apply** → `Invoke-SideChannelAssessment -Mode ApplyInteractive`
 5. **Validate** → Restart system, re-run assessment
-6. **Restore** → `.\SideChannel_Check_v2.ps1 -Mode Revert` (latest) or `-Mode RestoreInteractive` (browse backups)
+6. **Restore** → `Invoke-SideChannelAssessment -Mode Revert` (latest)
+   or `-Mode RestoreInteractive` (browse backups)
 
 ### Enterprise Deployment
 
@@ -1339,7 +1309,8 @@ When Enhanced IBRS shows "Active," only the BTI/Spectre v2 vulnerability is prot
 $computers = @("SERVER01", "SERVER02")
 $computers | ForEach-Object {
     Invoke-Command -ComputerName $_ -ScriptBlock {
-        & "C:\Scripts\SideChannel_Check_v2.ps1" -ExportPath "C:\Reports"
+        Import-Module SideChannelMitigations
+        Invoke-SideChannelAssessment -ExportPath "C:\Reports"
     }
 }
 ```
@@ -1374,7 +1345,7 @@ Get-Help about_Functions_CmdletBindingAttribute
 ```
 
 ### Unicode characters not displaying correctly
-**Solution:** v2.1.2 uses runtime Unicode generation for full compatibility.
+**Solution:** The module uses runtime Unicode generation for full compatibility.
 
 The script automatically generates Unicode characters (✓, ✗, ⚠, █, ░) at runtime using `[System.Char]::ConvertFromUtf32()`, ensuring consistent display across PowerShell 5.1 and 7.x without requiring specific file encoding.
 
@@ -1385,12 +1356,12 @@ The script automatically generates Unicode characters (✓, ✗, ⚠, █, ░) 
 
 **Cause:** Windows converts the `MitigationOptions` registry value from `REG_QWORD` to `REG_BINARY` after reboot. Older versions of the script couldn't read REG_BINARY format.
 
-**Solution:** v2.1.2+ automatically handles REG_BINARY conversion. The script now:
+**Solution:** The module automatically handles REG_BINARY conversion. It:
 - Detects when `MitigationOptions` is stored as a byte array (REG_BINARY)
 - Converts the 8-byte array to `uint64` using `[BitConverter]::ToUInt64()`
 - Performs correct bitwise comparison to verify the mitigation flag is set
 
-**No action needed** - upgrade to v2.1.2 or later. The detection works correctly both before and after system restart.
+**No action needed** - the current module version handles this correctly both before and after system restart.
 
 **Technical Details:**
 ```powershell
@@ -1411,188 +1382,25 @@ The script automatically generates Unicode characters (✓, ✗, ⚠, █, ░) 
 
 ## 📝 Changelog
 
-### v3.0.0 (2026-04-01)
-- 🔄 **BREAKING CHANGE: Sampler-based PowerShell module**
-  * Converted from monolithic script to Sampler-built module (`SideChannelMitigations`)
-  * Renamed functions: `Get-SideChannelMitigationDefinition`, `New-SideChannelBackup`, `Export-SideChannelAssessment`, `Invoke-SideChannelAssessment`, `Restore-SideChannelBackup`
-  * `-ExportPath` now accepts a **folder path** (CSV filename auto-generated as `SideChannelAssessment_<ComputerName>_<timestamp>.csv`)
-  * Added Pester 5 test suite, Azure DevOps pipeline, JaCoCo code coverage
-  * GitVersion-based semantic versioning for PSGallery publishing
-
-### v2.3.0 (2025-12-02)
-- 🔄 **BREAKING CHANGE: Intuitive Mode Names**
-  * Renamed modes to match their behavior - "Interactive" now means you make choices
-  * `RevertInteractive` → `Revert` - Quick restore of latest backup (no interaction needed)
-  * `Restore` → `RestoreInteractive` - Browse backups and selectively restore (full interaction)
-  * Updated all documentation, examples, and command references
-  * **Migration:** Update scripts using `-Mode RevertInteractive` to `-Mode Revert` and `-Mode Restore` to `-Mode RestoreInteractive`
-
-### v2.2.0 (2025-12-02)
-- ⚠️ **NEW: Intelligent microcode detection**
-  * Detects when registry values are set but CPU microcode updates are missing
-  * Shows "Inactive (Microcode Update Required)" status for SBDR/PSDP when registry configured but kernel inactive
-  * New warning section: ⚠ MICROCODE UPDATE REQUIRED with actionable guidance
-  * Explains common causes: outdated BIOS/UEFI, missing vendor microcode updates
-  * Special VM notes about hypervisor requirements
-- 🔴 **UPGRADED: SBDR and PSDP to Critical category**
-  * Changed from Recommended to Critical (high-severity CVEs)
-  * SBDR: CVE-2022-21123/21125 (MMIO Stale Data)
-  * PSDP: CVE-2022-0001/0002 (Branch History Injection)
-  * Bright red highlighting in PowerShell 7+ for Critical vulnerabilities
-- 🎨 **ENHANCED: Color coding improvements**
-  * Critical vulnerabilities: Bright red (ANSI 91)
-  * Recommended vulnerabilities: Regular red (ANSI 31)
-  * Unknown status: Yellow highlighting
-  * All Protected items consistently green
-
-### v2.1.9 (2025-12-02)
-- 🔧 **CRITICAL: Fixed FeatureSettingsOverride detection per Microsoft KB4072698**
-  * Changed from incorrect values (0, 72) to Microsoft-documented values
-  * Now accepts: 0x2048 (basic), 0x800000 (BHI only), 0x802048 (basic+BHI combined)
-  * Intel CPUs: Recommends 0x802048 (8396872) for Basic + BHI mitigations via bitwise OR (0x2048 | 0x800000)
-  * AMD CPUs: Recommends 0x2048 (8264) for Basic mitigations only (AMD not vulnerable to BHI)
-  * Validates SSBD system-wide enablement via runtime detection (SSBDWindowsSupportEnabledSystemWide)
-  * Updated SSBD mitigation URL to official Microsoft KB4072698 article
-  * Value 0 no longer accepted (does NOT enable system-wide mitigations)
-
-### v2.1.8 (2025-12-02)
-- 🔧 **Attempted SSBD fix** (later corrected in v2.1.9)
-  * Changed FeatureSettingsOverride from 72 to 0 (but 0 also incorrect)
-  * Issue: Value 0 enables per-process mitigations, NOT system-wide
-
-### v2.1.7 (2025-12-02)
-- 🔧 **CRITICAL: Fixed all kernel API flag bitmasks**
-  * Corrected KVAS detection: now uses 0x08 (RDCL HW Protected) instead of wrong 0x4000
-  * Fixed all flag bitmasks to match Microsoft SpeculationControl module exactly
-  * KVAS now correctly shows "Not Needed (HW Immune)" for Meltdown-immune CPUs (Tiger Lake, Ice Lake, etc.)
-  * Enhanced IBRS: Fixed from 0x100 to correct 0x10000
-  * MDS HW Protected: Fixed from 0x40000 to correct 0x1000000
-  * All 15+ flags now use Microsoft's exact bitmask values from official module
-
-### v2.1.6 (2025-12-02)
-- 🔬 **Added hardware-based detection via NtQuerySystemInformation API**
-  * Added flags2 reading for SBDR (0x01), FBSDP (0x02), PSDP (0x04) hardware protection
-  * Fixed regex bug: "Inactive" no longer matches "Active" pattern (added word boundary)
-  * Added FBSDP mitigation (Fill Buffer Stale Data Propagator)
-  * SBDR/PSDP now correctly show "Vulnerable" when hardware doesn't support
-  * Runtime detection now authoritative over registry-only checks
-
-### v2.1.5 (2025-12-02)
-- 📚 **Enhanced VM configuration guidance**
-  * Added hypervisor prerequisite notes to SBDR, SRBDS, and DRPW mitigations
-  * All CPU-specific mitigations now clearly indicate VM requirements
-  * Clarifies why Microsoft's SpeculationControl module may show "Windows OS support: False" on VMs
-  * Comprehensive guidance: PSDP, Retbleed, MMIO, SBDR, SRBDS, DRPW all require host-level configuration
-  * Helps administrators understand VM limitations and proper deployment sequence
-
-### v2.1.4 (2025-12-02)
-- 🐛 **Enhanced OS compatibility for hardware detection**
-  * Removed dependency on `Get-WindowsOptionalFeature` which causes errors on Windows Server and some client builds
-  * Improved VT-x/AMD-V detection using multiple fallback methods (registry, WMI, hypervisor presence)
-  * Better compatibility across Windows 10/11 client and Windows Server 2016-2025
-  * Fixes "Class not registered" errors on both client and server operating systems
-
-### v2.1.3 (2025-12-02)
-- 🐛 **Fixed Hyper-V detection on Windows 11 25H2**
-  * Replaced `Get-WindowsOptionalFeature` with multi-method detection to prevent "Class not registered" errors
-  * Added fallback detection using Hyper-V service, registry checks, and Win32_ComputerSystem
-  * Improves reliability across different Windows 11 builds and configurations
-
-### v2.1.2 (2025-12-02)
-- 🐛 **Critical Fix: REG_BINARY detection for MitigationOptions**
-  * Fixed detection failure after system reboot when Windows converts MitigationOptions to REG_BINARY
-  * Added automatic byte array to uint64 conversion in Compare-MitigationValue function
-  * Handles both REG_QWORD (pre-reboot) and REG_BINARY (post-reboot) registry formats
-  * Supports 8-byte (uint64) and 4-byte (uint32) binary conversions
-  * Hardware Security Mitigations now correctly detected in all scenarios
-- 📖 **Documentation updates**
-  * Added troubleshooting section for MitigationOptions REG_BINARY issue
-  * Included technical details about registry type conversion behavior
-
-### v2.1.1 (2025-12-01)
-- 📚 **Enhanced Runtime Status Guide**
-  * Updated from 4 to 5 comprehensive state descriptions in Bullets format
-  * Added "Active / Active (method)" - covers Enhanced IBRS, Retpoline variants
-  * Added "Supported" - for L1TF and similar hardware features
-  * Added "N/A" - when no runtime detection available
-  * Consolidated "Not Needed (HW Immune)" entry
-  * Guide now accurately reflects all possible states from 24 side-channel checks
-- 🐛 **Fixed recommendation syntax**
-  * Changed from `-Mode Apply -Interactive` to `-Mode ApplyInteractive`
-  * Updated line 1718 in Show-Recommendations function
-- 📖 **Documentation updates**
-  * Updated all sample outputs to reflect v2.1.1
-  * Enhanced Runtime Status Guide descriptions for clarity
-
-### v2.1.0 (2025-11-26)
-- ✨ Enhanced interactive modes with selective apply & restore
-  * **ApplyInteractive**: Choice between [R]ecommended (actionable only) or [A]ll mitigations view
-  * **Restore**: Support for [A]ll (complete) or [S]elective (individual) restoration
-  * Supports informed decision-making workflow after detailed assessment
-- 📚 **Comprehensive URL references for all mitigations**
-  * 22 authoritative URLs added (NVD, Microsoft Learn, Intel, AMD, TCG, UEFI)
-  * External documentation links in ShowDetails bullet-point view
-  * References to official CVE databases, vendor security advisories, and standards
-- 📊 **Enhanced detailed table with 7 columns**
-  * Added **CVE** column with descriptive names (e.g., "CVE-2017-5715 (Spectre v2)")
-  * Added **Platform** column showing applicability (All/Physical/HyperVHost/etc.)
-  * Added **Impact** column for performance assessment (Low/Medium/High)
-  * Added **Required For** column showing dependency relationships
-  * Smart truncation at 35 characters with "..." for long entries
-  * Both ANSI (PowerShell 7+) and fallback (PowerShell 5.1) implementations
-- 🔗 **Dependency mapping with PrerequisiteFor property**
-  * Hardware prerequisites show what they enable:
-    - UEFI → Secure Boot, VBS, HVCI, Credential Guard
-    - Secure Boot → VBS, HVCI, Credential Guard
-    - TPM 2.0 → BitLocker, VBS, Credential Guard, Windows Hello
-    - CPU Virtualization → Hyper-V, VBS, HVCI, Credential Guard
-    - IOMMU/VT-d → HVCI, VBS (full isolation), Kernel DMA Protection
-  * Security features show their dependents:
-    - VBS → HVCI, Credential Guard
-  * Displayed in both detailed table (truncated) and bullet-point view (full)
-- 🎨 **Improved CVE presentation**
-  * CVE numbers now include descriptive context in definitions
-  * Examples: "CVE-2017-5715 (Spectre v2)", "CVE-2018-12130 (ZombieLoad)"
-  * Clearer vulnerability identification in reports and exports
-- 🔧 Fixed restore mode warnings and improved reliability
-  * Intelligent filtering of hardware-only items (TPM 2.0, CPU Virtualization, IOMMU/VT-d)
-  * Clean restore summary: "Successfully restored: 21, Skipped (hardware-only): 3"
-  * No more "Cannot bind argument to parameter 'Path'" warnings
-- 🔧 Added parameter validation for incompatible combinations
-  * ShowDetails warns when used with non-applicable modes (only works with Assess/ApplyInteractive)
-- 🎨 Enhanced visual output with Unicode block characters (█░)
-  * Security score bar: `[████████████████████████████████████████] 100%`
-  * Runtime Unicode generation for PowerShell 5.1 & 7.x compatibility
-- 📊 Intelligent security scoring system
-  * Excludes N/A items and prerequisites from score calculation
-  * Focuses on actual configurable mitigations
-- 🛡️ Comprehensive hardware detection (5 prerequisites)
-- 💾 Dedicated Backup and Restore modes with JSON-based storage
-- ✨ WhatIf support for all modification modes
-- 🐛 Fixed PowerShell 5.1 compatibility issues (array handling, DateTime parsing)
-
-### v2.0.0 (2025-11-20)
-- 🎉 Initial v2 release
-- Modular function-based architecture
-- PowerShell 5.1 & 7.x compatibility
-- Runtime kernel detection
-- Interactive modes
-- Automatic backup creation
-- JSON-based restore system
+See the full [CHANGELOG](CHANGELOG.md) for detailed version history.
 
 ---
 
-## 📦 Legacy Version (v1.x)
+## 📦 Legacy Standalone Script
 
-The original v1.x version has been archived and is available in `archive/v1/` for reference. It is no longer actively maintained but remains available for compatibility with existing workflows.
+The original standalone script (`SideChannel_Check_v2.ps1`) and its
+companion files have been moved to the [`legacy/`](legacy/) folder.
+They are superseded by the v3.0.0 module but remain available for
+reference.
 
-**To use v1 (archived):**
-```powershell
-cd archive\v1
-.\SideChannel_Check.ps1
-```
+| File | Description |
+|---|---|
+| `legacy/SideChannel_Check_v2.ps1` | Monolithic v2.3.0 standalone script |
+| `legacy/Test-SideChannelTool.ps1` | Hand-rolled test harness for the v2 script |
+| `legacy/Check-HyperVHostMitigations.ps1` | Hyper-V host diagnostic companion |
 
-**Note:** v1 is feature-complete but does not include the enhanced features of v2.1.0 (selective restore, runtime Unicode generation, intelligent scoring, etc.). New deployments should use v2.1.0.
+> **Note:** New deployments should use the module
+> (`Install-Module SideChannelMitigations -AllowPrerelease`).
 
 ---
 
@@ -1722,7 +1530,7 @@ When running as a VMware guest, the tool provides GUI-based instructions to enab
 
 **Root Cause:** These mitigations require **hardware support** and **microcode updates**. Setting registry values alone is insufficient.
 
-**Detection Logic (v2.1.6+):**
+**Detection Logic:**
 - The tool reads **flags2** from the Windows kernel API (NtQuerySystemInformation)
 - Checks if hardware is protected via bits: SBDR (0x01), FBSDP (0x02), PSDP (0x04)
 - Checks if mitigation is **actually active** via FBClear bit (0x08)
@@ -1756,7 +1564,7 @@ If Microsoft's `Get-SpeculationControlSettings` also shows "Windows OS support i
 
 ### Why does my security score differ from Microsoft's SpeculationControl module?
 
-**This tool (v2.1.6+):**
+**This module:**
 - Performs **hardware-based detection** using Windows kernel APIs
 - Checks if mitigations are **actually active** in the kernel
 - Aligns detection logic with Microsoft's SpeculationControl module
@@ -1818,7 +1626,7 @@ When running as a Hyper-V guest, the tool provides PowerShell commands to enable
 2. **Check your CPU vendor** (Intel/AMD) - Read vendor-specific guidance for your hardware
 3. **Review CVE details** - Understand the specific vulnerabilities affecting your systems
 4. **Assess performance impact** - Use Microsoft/Red Hat studies to plan mitigation deployment
-5. **Validate with tools** - Cross-reference this script with Microsoft's SpeculationControl module
+5. **Validate with tools** - Cross-reference this module with Microsoft's SpeculationControl module
 6. **Stay updated** - Subscribe to vendor security advisories for new vulnerabilities
 
 ---
