@@ -27,7 +27,9 @@
         SideChannelAssessment_<ComputerName>_<yyyyMMdd_HHmmss>.csv
 
     .PARAMETER LogPath
-        Path to write detailed operation logs. Defaults to module Logs directory.
+        Destination folder path where operation logs will be written.
+        The log filename is generated automatically using the pattern:
+        SideChannelCheck_<yyyyMMdd_HHmmss>.log
 
     .PARAMETER BackupPath
         Path where backup files are stored. Defaults to module Backups directory.
@@ -82,14 +84,16 @@
     )
 
     # Set module-scoped paths from parameters or defaults
+    $logFileName = "SideChannelCheck_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+
     if ($LogPath) {
-        $script:LogPath = $LogPath
+        $script:LogPath = Join-Path $LogPath $logFileName
     } else {
         $logsDir = Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath 'Logs'
         if (-not (Test-Path $logsDir)) {
             $logsDir = Join-Path ([System.IO.Path]::GetTempPath()) 'SideChannelCheck'
         }
-        $script:LogPath = Join-Path $logsDir "SideChannelCheck_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+        $script:LogPath = Join-Path $logsDir $logFileName
     }
 
     if ($BackupPath) {

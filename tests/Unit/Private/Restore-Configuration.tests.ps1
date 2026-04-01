@@ -19,4 +19,120 @@ Describe 'Restore-Configuration' -Skip:(-not $builtModule) {
             }
         }
     }
+
+    Context 'When WhatIf is active' {
+        It 'Should preview changes without modifying registry' {
+            InModuleScope $script:moduleName {
+                $script:LogPath = Join-Path $TestDrive 'restore.log'
+                Mock -CommandName Write-Host
+                Mock -CommandName Set-ItemProperty
+
+                $backup = [PSCustomObject]@{
+                    Timestamp   = '2026-01-01T10:00:00'
+                    Mitigations = @(
+                        [PSCustomObject]@{
+                            Name         = 'SSBD'
+                            RegistryPath = 'HKLM:\SOFTWARE\Test'
+                            RegistryName = 'Val'
+                            Value        = 1
+                        }
+                    )
+                }
+
+                $WhatIfPreference = $true
+                Restore-Configuration -Backup $backup
+                Should -Invoke -CommandName Set-ItemProperty -Times 0
+            }
+        }
+    }
+
+    Context 'When restoring registry values' {
+        It 'Should call Set-ItemProperty for each restorable item' {
+            InModuleScope $script:moduleName {
+                $script:LogPath = Join-Path $TestDrive 'restore.log'
+                Mock -CommandName Write-Host
+                Mock -CommandName Set-ItemProperty
+
+                $backup = [PSCustomObject]@{
+                    Timestamp   = '2026-01-01T10:00:00'
+                    Mitigations = @(
+                        [PSCustomObject]@{
+                            Name         = 'SSBD'
+                            RegistryPath = 'HKLM:\SOFTWARE\Test'
+                            RegistryName = 'Val1'
+                            Value        = 1
+                        }
+                        [PSCustomObject]@{
+                            Name         = 'BTI'
+                            RegistryPath = 'HKLM:\SOFTWARE\Test'
+                            RegistryName = 'Val2'
+                            Value        = 0
+                        }
+                    )
+                }
+
+                $WhatIfPreference = $false
+                Restore-Configuration -Backup $backup
+                Should -Invoke -CommandName Set-ItemProperty -Times 2
+            }
+        }
+    }
+
+    Context 'When backup contains hardware-only items' {
+        It 'Should skip items with empty registry path' {
+            InModuleScope $script:moduleName {
+                $script:LogPath = Join-Path $TestDrive 'restore.log'
+                Mock -CommandName Write-Host
+                Mock -CommandName Set-ItemProperty
+
+                $backup = [PSCustomObject]@{
+                    Timestamp   = '2026-01-01T10:00:00'
+                    Mitigations = @(
+                        [PSCustomObject]@{
+                            Name         = 'UEFI'
+                            RegistryPath = ''
+                            RegistryName = ''
+                            Value        = $null
+                        }
+                        [PSCustomObject]@{
+                            Name         = 'SSBD'
+                            RegistryPath = 'HKLM:\SOFTWARE\Test'
+                            RegistryName = 'Val'
+                            Value        = 1
+                        }
+                    )
+                }
+
+                $WhatIfPreference = $false
+                Restore-Configuration -Backup $backup
+                Should -Invoke -CommandName Set-ItemProperty -Times 1
+            }
+        }
+    }
+
+    Context 'When backup item has null value' {
+        It 'Should call Remove-ItemProperty to delete the value' {
+            InModuleScope $script:moduleName {
+                $script:LogPath = Join-Path $TestDrive 'restore.log'
+                Mock -CommandName Write-Host
+                Mock -CommandName Remove-ItemProperty
+
+                $backup = [PSCustomObject]@{
+                    Timestamp   = '2026-01-01T10:00:00'
+                    Mitigations = @(
+                        [PSCustomObject]@{
+                            Name         = 'RemovedMit'
+                            RegistryPath = 'HKLM:\SOFTWARE\Test'
+                            RegistryName = 'OldVal'
+                            Value        = $null
+                        }
+                    )
+                }
+
+                $WhatIfPreference = $false
+                Restore-Configuration -Backup $backup
+                Should -Invoke -CommandName Remove-ItemProperty -Times 1
+            }
+        }
+    }
 }

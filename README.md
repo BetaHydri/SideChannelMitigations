@@ -190,7 +190,7 @@ Invoke-SideChannelAssessment -Mode RestoreInteractive
 | `-Mode` | `string` | `Assess` (default), `ApplyInteractive`, `Revert`, `Backup`, `RestoreInteractive` |
 | `-ShowDetails` | `switch` | Display CVE numbers, descriptions, URLs, and impact levels |
 | `-ExportPath` | `string` | Destination **folder** for CSV export. Filename is auto-generated as `SideChannelAssessment_<ComputerName>_<yyyyMMdd_HHmmss>.csv` |
-| `-LogPath` | `string` | Custom log file path (default: module `Logs/` directory) |
+| `-LogPath` | `string` | Destination **folder** for operation logs. Filename is auto-generated as `SideChannelCheck_<yyyyMMdd_HHmmss>.log` |
 | `-BackupPath` | `string` | Custom backup directory (default: module `Backups/` directory) |
 | `-ConfigPath` | `string` | Custom config directory (default: module `Config/` directory) |
 
@@ -371,7 +371,7 @@ Invoke-SideChannelAssessment -ShowDetails -ExportPath "C:\Reports"
 **Parameters:**
 - **`-ExportPath`** - Destination folder for CSV export (filename auto-generated as `SideChannelAssessment_<ComputerName>_<timestamp>.csv`)
 - **`-ShowDetails`** - Show detailed educational information (CVEs, descriptions, impacts)
-- **`-LogPath`** - Optional: Custom log file location (default: `.\Logs\SideChannelCheck_<timestamp>.log`)
+- **`-LogPath`** - Optional: Destination folder for operation logs (filename auto-generated as `SideChannelCheck_<yyyyMMdd_HHmmss>.log`)
 
 **Note:** The log file contains execution details (what the script did), while ExportPath creates a CSV of your security assessment data (what mitigations are enabled/disabled). Most users only need `-ExportPath` for reporting.
 
