@@ -1,5 +1,8 @@
 ﻿# Module-scoped variables - initialized on module import
-$script:ModuleVersion = '0.0.1'
+$script:ModuleVersion = try {
+    $manifestData = Import-PowerShellDataFile -Path (Join-Path $PSScriptRoot '*.psd1') -ErrorAction Stop
+    $manifestData.ModuleVersion
+} catch { '0.0.1' }
 
 $script:BackupPath = Join-Path $PSScriptRoot 'Backups'
 $script:ConfigPath = Join-Path $PSScriptRoot 'Config'
