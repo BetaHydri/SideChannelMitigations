@@ -3,8 +3,8 @@
 [![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B%20%7C%207.x-5391FE?logo=powershell&logoColor=white)](https://github.com/PowerShell/PowerShell)
 [![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?logo=windows&logoColor=white)](https://www.microsoft.com/windows)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-3.0.0-blue.svg)](https://github.com/BetaHydri/side-channel-vulnerabilities-check/releases)
-[![Maintained](https://img.shields.io/badge/Maintained-Yes-brightgreen.svg)](https://github.com/BetaHydri/side-channel-vulnerabilities-check/graphs/commit-activity)
+[![Version](https://img.shields.io/badge/Version-3.0.0-blue.svg)](https://github.com/BetaHydri/SideChannelMitigations/releases)
+[![Maintained](https://img.shields.io/badge/Maintained-Yes-brightgreen.svg)](https://github.com/BetaHydri/SideChannelMitigations/graphs/commit-activity)
 
 ## 📖 Overview
 

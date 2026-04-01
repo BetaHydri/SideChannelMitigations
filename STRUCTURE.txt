@@ -1,4 +1,4 @@
-side-channel-vulnerabilities-check/
+SideChannelMitigations/
 ├── .git/                               # Git repository metadata
 ├── .gitignore                          # Git ignore rules
 │

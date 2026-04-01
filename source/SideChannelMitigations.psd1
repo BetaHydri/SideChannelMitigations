@@ -104,10 +104,10 @@ PrivateData = @{
         Tags = @('Security', 'SideChannel', 'Spectre', 'Meltdown', 'Vulnerability', 'Mitigation', 'Windows', 'CPU', 'CVE', 'Assessment', 'Registry', 'HardwareDetection')
 
         # A URL to the license for this module.
-        LicenseUri = 'https://github.com/BetaHydri/side-channel-vulnerabilities-check/blob/main/LICENSE'
+        LicenseUri = 'https://github.com/BetaHydri/SideChannelMitigations/blob/main/LICENSE'
 
         # A URL to the main website for this project.
-        ProjectUri = 'https://github.com/BetaHydri/side-channel-vulnerabilities-check'
+        ProjectUri = 'https://github.com/BetaHydri/SideChannelMitigations'
 
         # A URL to an icon representing this module.
         # IconUri = ''

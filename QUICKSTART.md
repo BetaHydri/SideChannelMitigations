@@ -262,7 +262,7 @@ cd archive\v1
 ## 🆘 Need Help?
 
 1. **Full Documentation:** [README.md](README.md)
-2. **GitHub Issues:** https://github.com/BetaHydri/side-channel-vulnerabilities-check/issues
+2. **GitHub Issues:** https://github.com/BetaHydri/SideChannelMitigations/issues
 3. **Parameter Help:** `Get-Help .\SideChannel_Check_v2.ps1 -Detailed`
 
 ---
