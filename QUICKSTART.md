@@ -275,9 +275,9 @@ cd archive\v1
 | `-ShowDetails` | Switch | Show CVEs, descriptions, impacts, recommendations |
 | `-WhatIf` | Switch | Preview changes without applying |
 | `-ExportPath` | Folder path | **Export assessment results** to CSV (filename auto-generated) |
-| `-LogPath` | Path | Optional: Custom execution log location (default: `.\Logs\`) |
+| `-LogPath` | Folder path | Optional: Destination folder for execution logs (filename auto-generated) |
 
 **CSV Export vs Log File:**
 - **`-ExportPath`** → Your security assessment data (CSV with auto-generated filename in the specified folder)
-- **`-LogPath`** → Execution log (troubleshooting/audit trail of what the script did)
+- **`-LogPath`** → Execution log folder (troubleshooting/audit trail, filename auto-generated)
 - For most users, only `-ExportPath` is needed
