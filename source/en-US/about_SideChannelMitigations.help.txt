@@ -1,0 +1,24 @@
+TOPIC
+    about_SideChannelMitigations
+
+SHORT DESCRIPTION
+    Enterprise-grade PowerShell tool for assessing and managing Windows side-channel vulnerability mitigations with comprehensive hardware detection, intelligent platform-aware scoring, and automated backup/restore capabilities.
+
+LONG DESCRIPTION
+    Enterprise-grade PowerShell tool for assessing and managing Windows side-channel vulnerability mitigations with comprehensive hardware detection, intelligent platform-aware scoring, and automated backup/restore capabilities.
+
+EXAMPLES
+    PS C:\> {{ add examples here }}
+
+NOTE:
+    Thank you to all those who contributed to this module, by writing code, sharing opinions, and provided feedback.
+
+TROUBLESHOOTING NOTE:
+    Look out on the Github repository for issues and new releases.
+
+SEE ALSO
+    - {{ Please add Project URI such as github }}}
+
+KEYWORDS
+    {{ Add comma separated keywords here }}
+

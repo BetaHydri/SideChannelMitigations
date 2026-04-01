@@ -57,7 +57,7 @@ Evaluate security posture without making changes.
 .\SideChannel_Check_v2.ps1 -ShowDetails
 
 # Export to CSV
-.\SideChannel_Check_v2.ps1 -ExportPath "security_report.csv"
+.\SideChannel_Check_v2.ps1 -ExportPath "C:\Reports"
 ```
 
 ---
@@ -174,7 +174,7 @@ Selectively apply mitigations with two view modes.
 ### Quick Security Audit
 ```powershell
 # Assess and export report
-.\SideChannel_Check_v2.ps1 -ExportPath "audit_$(Get-Date -Format 'yyyyMMdd').csv"
+.\SideChannel_Check_v2.ps1 -ExportPath "C:\Reports"
 ```
 
 ### Safe Hardening (Recommended)
@@ -274,10 +274,10 @@ cd archive\v1
 | `-Mode` | Assess, ApplyInteractive, Revert, Backup, RestoreInteractive | Operation mode (default: Assess) |
 | `-ShowDetails` | Switch | Show CVEs, descriptions, impacts, recommendations |
 | `-WhatIf` | Switch | Preview changes without applying |
-| `-ExportPath` | Path | **Export assessment results** to CSV (mitigation status table) |
+| `-ExportPath` | Folder path | **Export assessment results** to CSV (filename auto-generated) |
 | `-LogPath` | Path | Optional: Custom execution log location (default: `.\Logs\`) |
 
 **CSV Export vs Log File:**
-- **`-ExportPath`** → Your security assessment data (CSV table for reporting/analysis)
+- **`-ExportPath`** → Your security assessment data (CSV with auto-generated filename in the specified folder)
 - **`-LogPath`** → Execution log (troubleshooting/audit trail of what the script did)
 - For most users, only `-ExportPath` is needed

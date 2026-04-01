@@ -3,7 +3,7 @@
 [![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B%20%7C%207.x-5391FE?logo=powershell&logoColor=white)](https://github.com/PowerShell/PowerShell)
 [![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?logo=windows&logoColor=white)](https://www.microsoft.com/windows)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-2.3.0-blue.svg)](https://github.com/BetaHydri/side-channel-vulnerabilities-check/releases)
+[![Version](https://img.shields.io/badge/Version-3.0.0-blue.svg)](https://github.com/BetaHydri/side-channel-vulnerabilities-check/releases)
 [![Maintained](https://img.shields.io/badge/Maintained-Yes-brightgreen.svg)](https://github.com/BetaHydri/side-channel-vulnerabilities-check/graphs/commit-activity)
 
 ## 📖 Overview
@@ -157,7 +157,230 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ---
 
-## 📋 Available Modes
+## � PowerShell Module Usage
+
+In addition to the standalone script, this project ships as a **Sampler-built PowerShell module** (`SideChannelMitigations`) that exposes five public functions for programmatic and pipeline-based workflows.
+
+### Installation
+
+```powershell
+# Install from PSGallery (stable)
+Install-Module -Name SideChannelMitigations -Scope CurrentUser
+
+# Install preview version
+Install-Module -Name SideChannelMitigations -AllowPrerelease -Scope CurrentUser
+
+# Import after installation
+Import-Module SideChannelMitigations
+```
+
+### Exported Functions
+
+| Function | Purpose |
+|----------|---------|
+| `Invoke-SideChannelAssessment` | Main orchestrator — runs assessments, applies mitigations, manages backups/restores |
+| `Export-SideChannelAssessment` | Exports assessment results to a CSV file in a specified folder |
+| `Get-SideChannelMitigationDefinition` | Returns all mitigation definitions (registry paths, CVEs, metadata) |
+| `New-SideChannelBackup` | Creates a timestamped JSON backup of current mitigation registry values |
+| `Restore-SideChannelBackup` | Restores mitigation settings from a specific or latest backup file |
+
+### `Invoke-SideChannelAssessment`
+
+The primary entry point. Supports five operation modes, WhatIf, and CSV export.
+
+```powershell
+# Default assessment
+Invoke-SideChannelAssessment
+
+# Detailed view with CVEs, descriptions, URLs
+Invoke-SideChannelAssessment -ShowDetails
+
+# Export results to a folder (CSV filename auto-generated)
+Invoke-SideChannelAssessment -ExportPath 'C:\Reports'
+
+# Preview mitigation changes without applying
+Invoke-SideChannelAssessment -Mode ApplyInteractive -WhatIf
+
+# Apply mitigations interactively (auto-creates backup)
+Invoke-SideChannelAssessment -Mode ApplyInteractive
+
+# Quick revert to latest backup
+Invoke-SideChannelAssessment -Mode Revert
+
+# Create a manual backup snapshot
+Invoke-SideChannelAssessment -Mode Backup
+
+# Browse all backups and selectively restore
+Invoke-SideChannelAssessment -Mode RestoreInteractive
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `-Mode` | `string` | `Assess` (default), `ApplyInteractive`, `Revert`, `Backup`, `RestoreInteractive` |
+| `-ShowDetails` | `switch` | Display CVE numbers, descriptions, URLs, and impact levels |
+| `-ExportPath` | `string` | Destination **folder** for CSV export. Filename is auto-generated as `SideChannelAssessment_<ComputerName>_<yyyyMMdd_HHmmss>.csv` |
+| `-LogPath` | `string` | Custom log file path (default: module `Logs/` directory) |
+| `-BackupPath` | `string` | Custom backup directory (default: module `Backups/` directory) |
+| `-ConfigPath` | `string` | Custom config directory (default: module `Config/` directory) |
+
+### `Export-SideChannelAssessment`
+
+Exports enriched assessment results to a semicolon-delimited CSV. Typically called indirectly by `Invoke-SideChannelAssessment -ExportPath`, but can be used standalone.
+
+```powershell
+# Get mitigation definitions and run your own assessment pipeline
+$defs = Get-SideChannelMitigationDefinition
+
+# Export results from a prior assessment
+Export-SideChannelAssessment -Results $results -Path 'C:\Reports'
+# → Creates C:\Reports\SideChannelAssessment_SERVER01_20260401_120000.csv
+```
+
+**CSV details:**
+- **18 columns** with full untruncated data (Id, Name, Category, Status, CVE, URL, etc.)
+- **Semicolon (`;`) delimiter** — avoids conflicts with comma-separated lists in data fields
+- **PowerShell 5.1 and 7.x compatible** — version-specific export handling
+
+### `Get-SideChannelMitigationDefinition`
+
+Returns an array of hashtables containing all mitigation definitions. Useful for custom reporting, filtering, or integration with other tools.
+
+```powershell
+# List all mitigation definitions
+Get-SideChannelMitigationDefinition
+
+# Filter for critical mitigations only
+Get-SideChannelMitigationDefinition | Where-Object { $_.Category -eq 'Critical' }
+
+# Get a specific mitigation by Id
+Get-SideChannelMitigationDefinition | Where-Object { $_.Id -eq 'KVAS' }
+
+# Count mitigations by category
+Get-SideChannelMitigationDefinition | Group-Object Category | Select-Object Name, Count
+```
+
+Each definition includes: `Id`, `Name`, `CVE`, `Category`, `RegistryPath`, `RegistryName`, `EnabledValue`, `Description`, `Impact`, `Platform`, `RuntimeDetection`, `Recommendation`, `URL`.
+
+### `New-SideChannelBackup`
+
+Creates a JSON backup of current mitigation registry values with WhatIf support.
+
+```powershell
+# Create a backup of all current mitigation settings
+New-SideChannelBackup -Mitigations (Get-SideChannelMitigationDefinition)
+
+# Preview backup operation
+New-SideChannelBackup -Mitigations (Get-SideChannelMitigationDefinition) -WhatIf
+```
+
+Backup files are saved as `Backups/Backup_<yyyyMMdd_HHmmss>.json` with metadata (timestamp, computer name, user, all registry values).
+
+### `Restore-SideChannelBackup`
+
+Restores mitigation settings from a backup file. Supports WhatIf and two parameter sets: restore a specific file or the latest backup.
+
+```powershell
+# Restore from the most recent backup
+Restore-SideChannelBackup -Latest
+
+# Restore from a specific backup file
+Restore-SideChannelBackup -Path '.\Backups\Backup_20260401_120000.json'
+
+# Preview latest restore without making changes
+Restore-SideChannelBackup -Latest -WhatIf
+
+# Use a custom backup directory
+Restore-SideChannelBackup -Latest -BackupPath 'D:\Backups\SideChannel'
+```
+
+### Enterprise Pipeline Examples
+
+```powershell
+# Assess multiple servers and export reports
+$servers = @('SERVER01', 'SERVER02', 'SERVER03')
+$servers | ForEach-Object {
+    Invoke-Command -ComputerName $_ -ScriptBlock {
+        Import-Module SideChannelMitigations
+        Invoke-SideChannelAssessment -ExportPath 'C:\SecurityReports'
+    }
+}
+
+# Audit all servers and collect results centrally
+$servers | ForEach-Object {
+    $session = New-PSSession -ComputerName $_
+    Invoke-Command -Session $session -ScriptBlock {
+        Import-Module SideChannelMitigations
+        Invoke-SideChannelAssessment -ExportPath 'C:\Temp'
+    }
+    # Copy the generated CSV back to a central share
+    Copy-Item -FromSession $session -Path 'C:\Temp\SideChannelAssessment_*.csv' `
+              -Destination "\\FileServer\SecurityAudits\$_\" -Force
+    Remove-PSSession $session
+}
+
+# Compare mitigation definitions across module versions
+$defs = Get-SideChannelMitigationDefinition
+$defs | Select-Object Id, Name, Category, CVE | Format-Table -AutoSize
+```
+
+---
+
+## 🔄 Best Practices Workflow
+
+The following flowchart shows the recommended workflow for assessing and hardening systems using this module.
+
+```mermaid
+flowchart TD
+    Start([Start]) --> Import[Import-Module<br/>SideChannelMitigations]
+    Import --> Assess[Invoke-SideChannelAssessment]
+    Assess --> Review{Review<br/>Security Score}
+
+    Review -->|Score ≥ 90%| ExportOnly[Export CSV Report<br/>Invoke-SideChannelAssessment<br/>-ExportPath 'C:\Reports']
+    ExportOnly --> Done([Done — Compliant])
+
+    Review -->|Score < 90%| Details[Review Details<br/>Invoke-SideChannelAssessment<br/>-ShowDetails]
+    Details --> Preview[Preview Changes<br/>Invoke-SideChannelAssessment<br/>-Mode ApplyInteractive -WhatIf]
+    Preview --> AcceptRisk{Accept<br/>Changes?}
+
+    AcceptRisk -->|No| ExportBaseline[Export Baseline Report<br/>Invoke-SideChannelAssessment<br/>-ExportPath 'C:\Reports']
+    ExportBaseline --> Done
+
+    AcceptRisk -->|Yes| Backup[Create Manual Backup<br/>Invoke-SideChannelAssessment<br/>-Mode Backup]
+    Backup --> Apply[Apply Mitigations<br/>Invoke-SideChannelAssessment<br/>-Mode ApplyInteractive]
+    Apply --> Restart[Restart System]
+    Restart --> Reassess[Re-run Assessment<br/>Invoke-SideChannelAssessment]
+    Reassess --> Verify{Verify<br/>Score Improved?}
+
+    Verify -->|Yes| ExportFinal[Export Final Report<br/>Invoke-SideChannelAssessment<br/>-ExportPath 'C:\Reports']
+    ExportFinal --> Done
+
+    Verify -->|No / Issues| Revert{Revert<br/>Needed?}
+    Revert -->|Quick Undo| QuickRevert[Restore-SideChannelBackup<br/>-Latest]
+    Revert -->|Selective| SelectiveRestore[Invoke-SideChannelAssessment<br/>-Mode RestoreInteractive]
+    QuickRevert --> Restart
+    SelectiveRestore --> Restart
+
+    style Start fill:#4CAF50,color:#fff
+    style Done fill:#4CAF50,color:#fff
+    style Backup fill:#FF9800,color:#fff
+    style Apply fill:#FF9800,color:#fff
+    style QuickRevert fill:#f44336,color:#fff
+    style SelectiveRestore fill:#f44336,color:#fff
+    style Assess fill:#2196F3,color:#fff
+    style Reassess fill:#2196F3,color:#fff
+```
+
+**Legend:**
+- 🟢 **Green** — Start/End states
+- 🔵 **Blue** — Assessment phases
+- 🟠 **Orange** — Change operations (backup, apply)
+- 🔴 **Red** — Recovery operations (revert, restore)
+
+---
+
+## �📋 Available Modes
 
 ### 1. **Assess** (Default)
 Evaluate current security posture without making changes.
@@ -170,14 +393,14 @@ Evaluate current security posture without making changes.
 .\SideChannel_Check_v2.ps1 -ShowDetails
 
 # Export results to CSV
-.\SideChannel_Check_v2.ps1 -ExportPath "security_assessment.csv"
+.\SideChannel_Check_v2.ps1 -ExportPath "C:\Reports"
 
 # Combine assessment with CSV export
-.\SideChannel_Check_v2.ps1 -ShowDetails -ExportPath "detailed_report.csv"
+.\SideChannel_Check_v2.ps1 -ShowDetails -ExportPath "C:\Reports"
 ```
 
 **Parameters:**
-- **`-ExportPath`** - Export assessment results table to CSV (mitigation status, recommendations)
+- **`-ExportPath`** - Destination folder for CSV export (filename auto-generated as `SideChannelAssessment_<ComputerName>_<timestamp>.csv`)
 - **`-ShowDetails`** - Show detailed educational information (CVEs, descriptions, impacts)
 - **`-LogPath`** - Optional: Custom log file location (default: `.\Logs\SideChannelCheck_<timestamp>.log`)
 
@@ -903,7 +1126,7 @@ Skipped (hardware-only): 3
 ### Sample Output - CSV Export
 
 ```
-.\SideChannel_Check_v2.ps1 -ExportPath "security_assessment.csv"
+.\SideChannel_Check_v2.ps1 -ExportPath "C:\Reports"
 
 ================================================================================
   Side-Channel Vulnerability Mitigation Tool - Version 2.1.1
@@ -911,7 +1134,7 @@ Skipped (hardware-only): 3
 
 [Assessment runs normally...]
 
-✓ Assessment exported successfully to: security_assessment.csv
+✓ Assessment exported successfully to: C:\Reports\SideChannelAssessment_SERVER01_20260401_120000.csv
 ```
 
 **CSV Features:**
@@ -1116,7 +1339,7 @@ When Enhanced IBRS shows "Active," only the BTI/Spectre v2 vulnerability is prot
 $computers = @("SERVER01", "SERVER02")
 $computers | ForEach-Object {
     Invoke-Command -ComputerName $_ -ScriptBlock {
-        & "C:\Scripts\SideChannel_Check_v2.ps1" -ExportPath "C:\Reports\$env:COMPUTERNAME.csv"
+        & "C:\Scripts\SideChannel_Check_v2.ps1" -ExportPath "C:\Reports"
     }
 }
 ```
@@ -1140,9 +1363,8 @@ Get-ChildItem ".\Backups\Backup_*.json"
 
 ### Export fails
 ```powershell
-# Create export directory
-$exportDir = Split-Path $ExportPath -Parent
-New-Item -ItemType Directory -Path $exportDir -Force
+# Ensure export directory exists
+New-Item -ItemType Directory -Path $ExportPath -Force
 ```
 
 ### WhatIf not working
@@ -1188,6 +1410,14 @@ The script automatically generates Unicode characters (✓, ✗, ⚠, █, ░) 
 ---
 
 ## 📝 Changelog
+
+### v3.0.0 (2026-04-01)
+- 🔄 **BREAKING CHANGE: Sampler-based PowerShell module**
+  * Converted from monolithic script to Sampler-built module (`SideChannelMitigations`)
+  * Renamed functions: `Get-SideChannelMitigationDefinition`, `New-SideChannelBackup`, `Export-SideChannelAssessment`, `Invoke-SideChannelAssessment`, `Restore-SideChannelBackup`
+  * `-ExportPath` now accepts a **folder path** (CSV filename auto-generated as `SideChannelAssessment_<ComputerName>_<timestamp>.csv`)
+  * Added Pester 5 test suite, Azure DevOps pipeline, JaCoCo code coverage
+  * GitVersion-based semantic versioning for PSGallery publishing
 
 ### v2.3.0 (2025-12-02)
 - 🔄 **BREAKING CHANGE: Intuitive Mode Names**
@@ -1593,7 +1823,7 @@ When running as a Hyper-V guest, the tool provides PowerShell commands to enable
 
 ---
 
-**Version:** 2.3.0  
-**Last Updated:** 2025-12-02  
+**Version:** 3.0.0  
+**Last Updated:** 2026-04-01  
 **PowerShell:** 5.1, 7.x  
 **Platform:** Windows 10/11, Server 2016+

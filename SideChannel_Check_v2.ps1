@@ -38,7 +38,9 @@
     Display detailed technical information
 
 .PARAMETER ExportPath
-    Path to export assessment results (CSV format). Can be used with any mode to save results.
+    Destination folder path where assessment results will be exported as CSV.
+    The CSV filename is generated automatically using the pattern:
+    SideChannelAssessment_<ComputerName>_<yyyyMMdd_HHmmss>.csv
 
 .PARAMETER LogPath
     Path to write detailed operation logs
@@ -68,8 +70,8 @@
     Browse backups and selectively restore specific mitigations
 
 .EXAMPLE
-    .\SideChannel_Check_v2.ps1 -ExportPath "results.csv"
-    Run assessment and export results to CSV
+    .\SideChannel_Check_v2.ps1 -ExportPath "C:\Reports"
+    Run assessment and export results as CSV to the specified folder
 
 .NOTES
     Version:        2.3.0
@@ -2729,6 +2731,15 @@ function Export-AssessmentResults {
     )
     
     try {
+        # Ensure destination folder exists
+        if (-not (Test-Path -Path $Path)) {
+            New-Item -Path $Path -ItemType Directory -Force | Out-Null
+        }
+
+        # Build auto-generated CSV filename
+        $fileName = "SideChannelAssessment_{0}_{1}.csv" -f $env:COMPUTERNAME, (Get-Date -Format 'yyyyMMdd_HHmmss')
+        $filePath = Join-Path -Path $Path -ChildPath $fileName
+
         # Enrich results with full untruncated data from mitigation definitions
         $enrichedResults = @()
         $mitigationDefs = Get-MitigationDefinitions
@@ -2765,7 +2776,7 @@ function Export-AssessmentResults {
         # PowerShell 5.1 doesn't support -Delimiter parameter, so we need version-specific handling
         if ($PSVersionTable.PSVersion.Major -ge 6) {
             # PowerShell 6+ (Core/7+) - use -Delimiter parameter
-            $enrichedResults | Export-Csv -Path $Path -NoTypeInformation -Encoding UTF8 -Delimiter ';'
+            $enrichedResults | Export-Csv -Path $filePath -NoTypeInformation -Encoding UTF8 -Delimiter ';'
         }
         else {
             # PowerShell 5.1 - manually convert to CSV with semicolon delimiter
@@ -2775,10 +2786,10 @@ function Export-AssessmentResults {
                 # This regex replaces commas that are not inside quotes
                 $_ -replace ',(?=(?:[^"]*"[^"]*")*[^"]*$)', ';'
             }
-            $csvContent | Set-Content -Path $Path -Encoding UTF8
+            $csvContent | Set-Content -Path $filePath -Encoding UTF8
         }
-        Write-Log "Assessment exported to: $Path" -Level Success
-        Write-Host "`n$(Get-StatusIcon -Name Success) Assessment exported successfully to: $Path" -ForegroundColor Green
+        Write-Log "Assessment exported to: $filePath" -Level Success
+        Write-Host "`n$(Get-StatusIcon -Name Success) Assessment exported successfully to: $filePath" -ForegroundColor Green
     }
     catch {
         Write-Log "Export failed: $($_.Exception.Message)" -Level Error
