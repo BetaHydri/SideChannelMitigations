@@ -24,6 +24,14 @@
             continue
         }
 
+        # Check CPU architecture applicability
+        $arch = $script:PlatformInfo.Details['CpuArchitecture']
+        $mitigationArch = if ($mitigation.ContainsKey('Architecture')) { $mitigation.Architecture } else { 'All' }
+        if ($mitigationArch -eq 'x86' -and $arch -in @('ARM64', 'ARM')) {
+            Write-Log "Skipping $($mitigation.Name) - not applicable to $arch (x86/x64 only)" -Level Debug
+            continue
+        }
+
         $result = Test-Mitigation -Mitigation $mitigation
         $results += $result
     }

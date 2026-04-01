@@ -88,5 +88,16 @@
     $script:PlatformInfo.Details['OSVersion'] = $os.Caption
     $script:PlatformInfo.Details['OSBuild'] = $os.BuildNumber
 
-    Write-Log -Message "Platform detected: $($script:PlatformInfo.Type)" -Level Info
+    # Detect CPU architecture
+    $arch = $cpu.Architecture
+    # Win32_Processor.Architecture: 0=x86, 5=ARM, 9=x64, 12=ARM64
+    switch ($arch) {
+        12      { $script:PlatformInfo.Details['CpuArchitecture'] = 'ARM64' }
+        5       { $script:PlatformInfo.Details['CpuArchitecture'] = 'ARM' }
+        9       { $script:PlatformInfo.Details['CpuArchitecture'] = 'x64' }
+        0       { $script:PlatformInfo.Details['CpuArchitecture'] = 'x86' }
+        default { $script:PlatformInfo.Details['CpuArchitecture'] = 'Unknown' }
+    }
+
+    Write-Log -Message "Platform detected: $($script:PlatformInfo.Type) ($($script:PlatformInfo.Details['CpuArchitecture']))" -Level Info
 }

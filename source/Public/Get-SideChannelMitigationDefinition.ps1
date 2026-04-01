@@ -25,6 +25,7 @@
             Description      = 'Prevents Speculative Store Bypass (Variant 4) attacks'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = 'SSBD'
             Recommendation   = 'Intel CPUs: Set to 0x802048 (8396872) for Basic+BHI mitigations. AMD CPUs: Set to 0x2048 (8264) for Basic mitigations. Use bitwise OR (0x2048 | 0x800000 = 0x802048) to combine. Value 0 does NOT enable system-wide.'
             URL              = 'https://support.microsoft.com/en-us/topic/kb4072698-windows-server-and-azure-stack-hci-guidance-to-protect-against-silicon-based-microarchitectural-and-speculative-execution-side-channel-vulnerabilities-2f965763-00e2-8f98-b632-0d96f30c8c8e'
@@ -40,6 +41,7 @@
             Description      = 'Required companion setting for SSBD'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = $null
             Recommendation   = 'Must be enabled for SSBD to function'
             URL              = 'https://nvd.nist.gov/vuln/detail/CVE-2018-3639'
@@ -55,6 +57,7 @@
             Description      = 'Mitigates Spectre Variant 2 attacks'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = 'BTI'
             Recommendation   = 'Essential protection against Spectre v2'
             URL              = 'https://nvd.nist.gov/vuln/detail/CVE-2017-5715'
@@ -70,6 +73,7 @@
             Description      = 'Page table isolation to prevent Meltdown attacks'
             Impact           = 'Medium'
             Platform         = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = 'KVAS'
             Recommendation   = 'Critical for Meltdown protection; modern CPUs have hardware immunity'
             URL              = 'https://nvd.nist.gov/vuln/detail/CVE-2017-5754'
@@ -85,6 +89,7 @@
             Description      = 'Hardware-based Spectre v2 protection'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = $null
             Recommendation   = 'Enable on CPUs with Enhanced IBRS support'
             URL              = 'https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/indirect-branch-restricted-speculation.html'
@@ -100,6 +105,7 @@
             Description      = 'Disable Intel TSX to prevent TAA vulnerabilities'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = $null
             Recommendation   = 'Disable unless specifically required by applications'
             URL              = 'https://nvd.nist.gov/vuln/detail/CVE-2019-11135'
@@ -117,6 +123,7 @@
             Description      = 'Protects against L1 Terminal Fault (Foreshadow)'
             Impact           = 'High'
             Platform         = 'HyperVHost'
+            Architecture     = 'x86'
             RuntimeDetection = 'L1TF'
             Recommendation   = 'High performance impact; for multi-tenant virtualization only'
             URL              = 'https://nvd.nist.gov/vuln/detail/CVE-2018-3620'
@@ -132,6 +139,7 @@
             Description      = 'Protects against MDS attacks'
             Impact           = 'Medium'
             Platform         = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = 'MDS'
             Recommendation   = 'Moderate performance impact; modern CPUs have hardware immunity'
             URL              = 'https://nvd.nist.gov/vuln/detail/CVE-2018-12130'
@@ -147,6 +155,7 @@
             Description      = 'Protects against TAA vulnerabilities'
             Impact           = 'Medium'
             Platform         = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = $null
             Recommendation   = 'Enable if TSX cannot be disabled'
             URL              = 'https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/intel-tsx-asynchronous-abort.html'
@@ -162,6 +171,7 @@
             Description      = 'Core hardware-based security features (requires CPU support)'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = $null
             Recommendation   = 'Enable core hardware mitigation features (Note: VMs require CPU features exposed by hypervisor - see VM configuration guidance for Hyper-V/VMware)'
         },
@@ -178,6 +188,7 @@
             Description      = 'Shared Buffer Data Read/Sampling protection'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = 'SBDR'
             Recommendation   = 'Enable to protect against SBDR/SBDS attacks (VM Note: Hypervisor host must have this mitigation enabled and restarted first - see HYPERVISOR_CONFIGURATION.md)'
             URL              = 'https://nvd.nist.gov/vuln/detail/CVE-2022-21123'
@@ -193,6 +204,7 @@
             Description      = 'Fill Buffer Stale Data Propagator protection'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = 'FBSDP'
             Recommendation   = 'Enable to protect against FBSDP attacks (VM Note: Hypervisor host must have this mitigation enabled and restarted first - see HYPERVISOR_CONFIGURATION.md)'
             URL              = 'https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/processor-mmio-stale-data-vulnerabilities.html'
@@ -208,6 +220,7 @@
             Description      = 'Special Register Buffer Data Sampling protection'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = $null
             Recommendation   = 'Enable to protect against SRBDS attacks (VM Note: Hypervisor host must have this mitigation enabled and restarted first - see HYPERVISOR_CONFIGURATION.md)'
             URL              = 'https://nvd.nist.gov/vuln/detail/CVE-2022-21127'
@@ -223,6 +236,7 @@
             Description      = 'Device Register Partial Write protection'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = $null
             Recommendation   = 'Enable to protect against DRPW attacks (VM Note: Hypervisor host must have this mitigation enabled and restarted first - see HYPERVISOR_CONFIGURATION.md)'
             URL              = 'https://nvd.nist.gov/vuln/detail/CVE-2022-21166'
@@ -238,6 +252,7 @@
             Description      = 'Prevents Branch History Injection (BHI/Spectre-BHB) attacks'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = 'PSDP'
             Recommendation   = 'Enable to protect against Branch History Injection vulnerabilities (VM Note: Hypervisor host must have this mitigation enabled and restarted first - see HYPERVISOR_CONFIGURATION.md)'
             URL              = 'https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/branch-history-injection.html'
@@ -253,6 +268,7 @@
             Description      = 'Mitigates return instruction speculation vulnerability (Retbleed)'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = $null
             Recommendation   = 'Enable to protect against Retbleed attacks on AMD and Intel CPUs (VM Note: Hypervisor host must have this mitigation enabled and restarted first - see HYPERVISOR_CONFIGURATION.md)'
             URL              = 'https://www.amd.com/en/corporate/product-security/bulletin/amd-sb-1037'
@@ -268,6 +284,7 @@
             Description      = 'Protects against processor MMIO stale data vulnerabilities'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'x86'
             RuntimeDetection = $null
             Recommendation   = 'Enable to protect against MMIO stale data attacks (VM Note: Hypervisor host must have this mitigation enabled and restarted first - see HYPERVISOR_CONFIGURATION.md)'
             URL              = 'https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/processor-mmio-stale-data-vulnerabilities.html'
@@ -285,6 +302,7 @@
             Description      = 'Validates exception handler chains (SEH protection)'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = $null
             Recommendation   = 'Enable to prevent SEH exploitation'
             URL              = 'https://learn.microsoft.com/en-us/windows/win32/secbp/control-flow-guard'
@@ -300,6 +318,7 @@
             Description      = 'Prevents kernel access to user-mode pages'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = $null
             Recommendation   = 'Enable to prevent privilege escalation attacks'
             URL              = 'https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/secure-coding/supervisor-mode-access-prevention.html'
@@ -315,6 +334,7 @@
             Description      = 'Hardware-based security isolation using virtualization'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = $null
             Recommendation   = 'Enable for enhanced kernel isolation (requires hardware support)'
             HardwareRequired = 'VBS'
@@ -332,6 +352,7 @@
             Description      = 'Hardware-enforced code integrity using hypervisor'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = $null
             Recommendation   = 'Enable for kernel code integrity enforcement (requires VBS)'
             HardwareRequired = 'HVCI'
@@ -348,6 +369,7 @@
             Description      = 'Protects domain credentials using VBS'
             Impact           = 'Low'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = $null
             Recommendation   = 'Enable for domain credential protection (requires VBS)'
             HardwareRequired = 'VBS'
@@ -364,6 +386,7 @@
             Description      = 'Prevents SMT-based side-channel attacks between VMs'
             Impact           = 'Medium'
             Platform         = 'HyperVHost'
+            Architecture     = 'All'
             RuntimeDetection = $null
             Recommendation   = 'Enable on Hyper-V hosts for multi-tenant environments'
             URL              = 'https://learn.microsoft.com/en-us/windows-server/virtualization/hyper-v/manage/manage-hyper-v-scheduler-types'
@@ -379,6 +402,7 @@
             Description      = 'Disables SMT/Hyperthreading for maximum side-channel protection'
             Impact           = 'Very High'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = $null
             Recommendation   = 'Only for highest security environments - causes ~50% performance loss. Consider Hyper-V Core Scheduler instead for VMs.'
             URL              = 'https://learn.microsoft.com/en-us/windows-server/virtualization/hyper-v/manage/manage-hyper-v-scheduler-types'
@@ -396,6 +420,7 @@
             Description      = 'UEFI firmware mode (required for Secure Boot and modern security)'
             Impact           = 'None'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = $null
             Recommendation   = 'UEFI mode required for Secure Boot, VBS, and HVCI'
             IsPrerequisite   = $true
@@ -413,6 +438,7 @@
             Description      = 'Prevents unauthorized bootloaders and boot-level malware'
             Impact           = 'None'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = $null
             Recommendation   = 'Enable in UEFI firmware settings for boot security'
             IsPrerequisite   = $true
@@ -430,6 +456,7 @@
             Description      = 'Trusted Platform Module for hardware-based cryptography'
             Impact           = 'None'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = $null
             Recommendation   = 'TPM 2.0 required for BitLocker, Credential Guard, and VBS'
             IsPrerequisite   = $true
@@ -447,6 +474,7 @@
             Description      = 'Hardware virtualization support for Hyper-V and VBS'
             Impact           = 'None'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = $null
             Recommendation   = 'Enable in BIOS/UEFI for Hyper-V and VBS support'
             IsPrerequisite   = $true
@@ -464,6 +492,7 @@
             Description      = 'I/O Memory Management Unit for DMA protection'
             Impact           = 'None'
             Platform         = 'All'
+            Architecture     = 'All'
             RuntimeDetection = $null
             Recommendation   = 'Required for HVCI and advanced VBS features'
             IsPrerequisite   = $true
