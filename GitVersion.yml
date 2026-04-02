@@ -1,4 +1,4 @@
-mode: ContinuousDelivery
+mode: ContinuousDeployment
 next-version: 1.0.0
 major-version-bump-message: '(breaking\schange|breaking|major)\b'
 minor-version-bump-message: '(adds?|features?|minor)\b'
