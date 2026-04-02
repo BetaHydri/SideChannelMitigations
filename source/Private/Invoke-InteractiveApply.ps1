@@ -153,12 +153,13 @@
 
         Write-Host "WhatIf Summary:" -ForegroundColor Cyan
         Write-Host "Total changes that would be made: $($selectedItems.Count)" -ForegroundColor White
-        Write-Host "Backup would be created: Yes" -ForegroundColor White
+        Write-Host "Backup would be created: Yes (selected mitigations only)" -ForegroundColor White
         Write-Host "System restart would be required: Yes" -ForegroundColor Yellow
         return
     }
 
-    Write-Host "`nA backup will be created before applying changes."
+    Write-Host "`nA selective backup of the chosen mitigations will be created before applying changes."
+    Write-Host "Tip: Use '-Mode Backup' for a full backup of all mitigations." -ForegroundColor Gray
     Write-Host "Do you want to proceed? (Y/N): " -NoNewline -ForegroundColor Yellow
     $confirm = Read-Host
 
@@ -167,9 +168,12 @@
         return
     }
 
-    # Create backup
+    # Create backup of only the selected mitigations (not all)
+    # For a full backup of all mitigations, use: Invoke-SideChannelAssessment -Mode Backup
     $mitigations = Get-SideChannelMitigationDefinition
-    $backupFile = New-SideChannelBackup -Mitigations $mitigations
+    $selectedMitigations = @($mitigations | Where-Object { $_.Id -in $selectedItems.Id })
+    $backupFile = New-SideChannelBackup -Mitigations $selectedMitigations
+    Write-Log "Selective backup created with $($selectedMitigations.Count) mitigation(s)" -Level Info
 
     # Apply
     Write-Host "`nApplying mitigations..." -ForegroundColor Cyan
