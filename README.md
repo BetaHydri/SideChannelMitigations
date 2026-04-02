@@ -395,8 +395,8 @@ The platform information section now includes comprehensive hardware capability 
 - **Firmware** - UEFI (green) or Legacy BIOS (yellow)
 - **Secure Boot** - Enabled (green), Capable but Disabled (yellow), or Not Supported (red)
 - **TPM** - Present with version (green) or Not Detected (red)
-- **VT-x/AMD-V** - CPU virtualization status (green enabled, red disabled)
-- **IOMMU/VT-d** - I/O memory management detection (green detected, red not detected)
+- **VT-x/AMD-V/ARM VHE** - CPU virtualization status (green enabled, red disabled)
+- **IOMMU/VT-d/ARM SMMU** - I/O memory management detection (green detected, red not detected)
 - **VBS Capable** - Hardware prerequisites met for Virtualization Based Security (green yes, red no with hints)
 - **HVCI Capable** - Hardware prerequisites met for Hypervisor-protected Code Integrity
 
@@ -771,7 +771,7 @@ Skipped (hardware-only): 3
 - Recover from misconfiguration
 - Rollback individual settings while keeping others
 
-**Note:** Hardware-only features (TPM 2.0, CPU Virtualization, IOMMU/VT-d) are firmware/BIOS settings and cannot be restored from registry backups. These are automatically skipped during restore operations.
+**Note:** Hardware-only features (TPM 2.0, CPU Virtualization, IOMMU) are firmware/BIOS settings and cannot be restored from registry backups. These are automatically skipped during restore operations.
 
 ---
 
@@ -846,8 +846,8 @@ Hyper-V Core Scheduler                       Protected           No             
 UEFI Firmware                                Active              No                       None
 Secure Boot                                  Protected           No                       None
 TPM 2.0                                      Protected           No                       None
-CPU Virtualization (VT-x/AMD-V)              Protected           No                       None
-IOMMU/VT-d Support                           Protected           No                       None
+CPU Virtualization (VT-x/AMD-V/ARM VHE)   Protected           No                       None
+IOMMU (VT-d/AMD-Vi/ARM SMMU)               Protected           No                       None
 
 Detailed Table (with -ShowDetails flag):
 Mitigation                     Category     Status       CVE                       Platform     Impact   Required For
@@ -861,7 +861,7 @@ UEFI Firmware                  Prerequisite Active       Boot Security Prerequi.
 Secure Boot                    Prerequisite Protected    Boot Malware Protection   All          None     VBS, HVCI, Credential Guard
 TPM 2.0                        Prerequisite Protected    Hardware Cryptographic... All          None     BitLocker, VBS, Credential Guar...
 CPU Virtualization (VT-x/AM... Prerequisite Protected    Virtualization Prerequ... All          None     Hyper-V, VBS, HVCI, Credential ...
-IOMMU/VT-d Support             Prerequisite Protected    DMA Protection            All          None     HVCI, VBS (full isolation), Ker...
+IOMMU (VT-d/AMD-Vi/ARM SM...   Prerequisite Protected    DMA Protection            All          None     HVCI, VBS (full isolation), Ker...
 
 ✓ All critical mitigations are properly configured!
 ```
@@ -1203,8 +1203,8 @@ When Enhanced IBRS shows "Active," only the BTI/Spectre v2 vulnerability is prot
 - **UEFI Firmware** - Required for modern security
 - **Secure Boot** - Boot integrity protection
 - **TPM 2.0** - Hardware cryptographic security
-- **CPU Virtualization (VT-x/AMD-V)** - For Hyper-V and VBS
-- **IOMMU/VT-d** - DMA protection and HVCI optimization
+- **CPU Virtualization (VT-x/AMD-V/ARM VHE)** - For Hyper-V and VBS
+- **IOMMU (VT-d/AMD-Vi/ARM SMMU)** - DMA protection and HVCI optimization
 
 ---
 

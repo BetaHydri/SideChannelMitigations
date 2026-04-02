@@ -62,7 +62,7 @@
         $script:HardwareInfo.TPMPresent = $false
     }
 
-    # Check CPU Virtualization (VT-x/AMD-V)
+    # Check CPU Virtualization (VT-x/AMD-V/ARM VHE)
     try {
         $cpu = Get-CimInstance -ClassName Win32_Processor | Select-Object -First 1
         if ($cpu.VirtualizationFirmwareEnabled -eq $true) {
@@ -100,7 +100,7 @@
         $script:HardwareInfo.VTxEnabled = $false
     }
 
-    # Check IOMMU/VT-d
+    # Check IOMMU (VT-d/AMD-Vi/ARM SMMU)
     try {
         $iommuRegistry = Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\iommu" -ErrorAction SilentlyContinue
         if ($iommuRegistry) {

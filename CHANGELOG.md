@@ -5,6 +5,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Display labels for CPU virtualization and IOMMU now adapt to the detected
+  architecture: ARM64 shows "ARM VHE" / "SMMU", x86/x64 shows
+  "VT-x/AMD-V" / "IOMMU/VT-d".
+- Renamed prerequisite `CPU Virtualization (VT-x/AMD-V)` to
+  `CPU Virtualization (VT-x/AMD-V/ARM VHE)`.
+- Renamed prerequisite `IOMMU/VT-d Support` to
+  `IOMMU (VT-d/AMD-Vi/ARM SMMU)`.
+- Updated README sample output and hardware feature descriptions to
+  include ARM64 equivalents.
+
 ## [3.3.1] - 2026-04-02
 
 ### Fixed
