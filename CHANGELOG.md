@@ -5,6 +5,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0] - 2026-04-02
+
+### Fixed
+
+- `Invoke-InteractiveApply` now creates a selective backup containing only the
+  mitigations the user chose to apply, instead of backing up all 29 mitigations.
+  This ensures `-Mode Revert` and `-Mode RestoreInteractive` display only the
+  items that were actually changed.
+
+### Changed
+
+- WhatIf output for `ApplyInteractive` now indicates "selected mitigations only"
+  for the backup.
+- Added user hint about `-Mode Backup` for creating full backups of all
+  mitigations.
+
+### Added
+
+- Unit tests for `Invoke-InteractiveApply` covering selective backup, full
+  selection, and WhatIf behavior.
+- Unit tests for `Invoke-InteractiveRestore` covering display filtering,
+  hardware-only items, and item selection.
+
 ## [3.4.0] - 2026-04-02
 
 ### Changed
