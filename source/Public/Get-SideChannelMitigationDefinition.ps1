@@ -465,7 +465,7 @@
         },
         @{
             Id               = 'VTx'
-            Name             = 'CPU Virtualization (VT-x/AMD-V)'
+            Name             = 'CPU Virtualization (VT-x/AMD-V/ARM VHE)'
             CVE              = 'Virtualization Prerequisite'
             Category         = 'Prerequisite'
             RegistryPath     = $null
@@ -476,14 +476,14 @@
             Platform         = 'All'
             Architecture     = 'All'
             RuntimeDetection = $null
-            Recommendation   = 'Enable in BIOS/UEFI for Hyper-V and VBS support'
+            Recommendation   = 'Enable in BIOS/UEFI for Hyper-V and VBS support. ARM64: Virtualization Host Extensions (VHE/EL2).'
             IsPrerequisite   = $true
             PrerequisiteFor  = 'Hyper-V, VBS, HVCI, Credential Guard'
             URL              = 'https://www.intel.com/content/www/us/en/virtualization/virtualization-technology/intel-virtualization-technology.html'
         },
         @{
             Id               = 'IOMMU'
-            Name             = 'IOMMU/VT-d Support'
+            Name             = 'IOMMU (VT-d/AMD-Vi/ARM SMMU)'
             CVE              = 'DMA Protection'
             Category         = 'Prerequisite'
             RegistryPath     = $null
@@ -494,7 +494,7 @@
             Platform         = 'All'
             Architecture     = 'All'
             RuntimeDetection = $null
-            Recommendation   = 'Required for HVCI and advanced VBS features'
+            Recommendation   = 'Required for HVCI and advanced VBS features. ARM64: System MMU (SMMU).'
             IsPrerequisite   = $true
             PrerequisiteFor  = 'HVCI, VBS (full isolation), Kernel DMA Protection'
             URL              = 'https://www.intel.com/content/www/us/en/virtualization/virtualization-technology/intel-virtualization-technology-for-directed-io.html'

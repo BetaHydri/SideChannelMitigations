@@ -62,7 +62,12 @@
     }
 
     # CPU Virtualization
-    Write-Host "VT-x/AMD-V:  " -NoNewline
+    $virtLabel = switch ($script:PlatformInfo.Details['CpuArchitecture']) {
+        'ARM64' { 'ARM VHE:     ' }
+        'ARM'   { 'ARM Virt:    ' }
+        default { 'VT-x/AMD-V:  ' }
+    }
+    Write-Host $virtLabel -NoNewline
     if ($script:HardwareInfo.VTxEnabled) {
         Write-Host "Enabled" -ForegroundColor Green
     }
@@ -70,8 +75,13 @@
         Write-Host "Disabled or Not Supported" -ForegroundColor Red
     }
 
-    # IOMMU/VT-d
-    Write-Host "IOMMU/VT-d:  " -NoNewline
+    # IOMMU
+    $iommuLabel = switch ($script:PlatformInfo.Details['CpuArchitecture']) {
+        'ARM64' { 'SMMU:        ' }
+        'ARM'   { 'SMMU:        ' }
+        default { 'IOMMU/VT-d:  ' }
+    }
+    Write-Host $iommuLabel -NoNewline
     if ($script:HardwareInfo.IOMMUSupport) {
         Write-Host "Detected" -ForegroundColor Green
     }
@@ -96,7 +106,8 @@
             Write-Host "             (Requires: CPU Virtualization)" -ForegroundColor Gray
         }
         elseif (-not $script:HardwareInfo.IOMMUSupport) {
-            Write-Host "             (Requires: IOMMU/VT-d)" -ForegroundColor Gray
+            $iommuHint = if ($script:PlatformInfo.Details['CpuArchitecture'] -in @('ARM64', 'ARM')) { 'SMMU' } else { 'IOMMU/VT-d' }
+            Write-Host "             (Requires: $iommuHint)" -ForegroundColor Gray
         }
     }
 
