@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-04-02
+
 ### Changed
 
 - Display labels for CPU virtualization and IOMMU now adapt to the detected
@@ -16,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `IOMMU (VT-d/AMD-Vi/ARM SMMU)`.
 - Updated README sample output and hardware feature descriptions to
   include ARM64 equivalents.
+- Switched GitVersion mode from ContinuousDelivery to
+  ContinuousDeployment for unique preview version numbers.
 
 ## [3.3.1] - 2026-04-02
 
