@@ -151,7 +151,7 @@ Invoke-SideChannelAssessment -Mode Backup
 | `Export-SideChannelAssessment` | Exports assessment results to a CSV file in a specified folder |
 | `Get-SideChannelMitigationDefinition` | Returns all mitigation definitions (registry paths, CVEs, metadata) |
 | `New-SideChannelBackup` | Creates a timestamped JSON backup of current mitigation registry values |
-| `Restore-SideChannelBackup` | Restores mitigation settings from a specific or latest backup file |
+| `Restore-SideChannelBackup` | Restores mitigation settings from a specific or latest backup file (non-interactive; for interactive browse/select use `-Mode RestoreInteractive`) |
 
 ### `Invoke-SideChannelAssessment`
 
@@ -249,6 +249,12 @@ Backup files are saved as `Backups/Backup_<yyyyMMdd_HHmmss>.json` with metadata 
 ### `Restore-SideChannelBackup`
 
 Restores mitigation settings from a backup file. Supports WhatIf and two parameter sets: restore a specific file or the latest backup.
+
+> **Note:** This function is **non-interactive** and designed for
+> scripts, automation, and pipelines. For an interactive experience
+> (browse backups, select by number, selectively restore individual
+> mitigations), use
+> `Invoke-SideChannelAssessment -Mode RestoreInteractive` instead.
 
 ```powershell
 # Restore from the most recent backup
