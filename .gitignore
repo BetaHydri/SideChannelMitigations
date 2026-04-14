@@ -1,8 +1,11 @@
-# Sampler build output
+# Build output
 output/
 
 # PowerShell module artifacts
 *.nupkg
+
+# Memory Bank (local agent context, never push)
+.memory-bank/
 
 # IDE
 *.code-workspace
