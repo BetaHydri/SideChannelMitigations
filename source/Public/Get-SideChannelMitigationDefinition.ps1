@@ -21,13 +21,13 @@
             Category         = 'Critical'
             RegistryPath     = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management'
             RegistryName     = 'FeatureSettingsOverride'
-            EnabledValue     = 0x802048  # Microsoft KB4072698: 0x2048 (8264) = Basic only, 0x802048 (8396872) = Basic+BHI (RECOMMENDED for Intel)
+            EnabledValue     = (Get-RecommendedFeatureSettingsOverride)  # Microsoft KB4072698: 0x48 (72) HT enabled, 0x2048 (8264) HT disabled; Intel adds BHI 0x800000
             Description      = 'Prevents Speculative Store Bypass (Variant 4) attacks'
             Impact           = 'Low'
             Platform         = 'All'
             Architecture     = 'x86'
             RuntimeDetection = 'SSBD'
-            Recommendation   = 'Intel CPUs: Set to 0x802048 (8396872) for Basic+BHI mitigations. AMD CPUs: Set to 0x2048 (8264) for Basic mitigations. Use bitwise OR (0x2048 | 0x800000 = 0x802048) to combine. Value 0 does NOT enable system-wide. ARM64 CPUs: Not applicable — mitigated via firmware (SMCCC_ARCH_WORKAROUND_2).'
+            Recommendation   = 'Hyper-Threading enabled: 0x48 (72), as checked by the Microsoft Assessment. Hyper-Threading disabled: 0x2048 (8264). Intel CPUs additionally get BHI (0x800000 via bitwise OR, e.g. 0x800048 = 8388680). Both documented Microsoft values (72, 8264) and their BHI combinations are accepted. Value 0 does NOT enable system-wide. ARM64 CPUs: Not applicable - mitigated via firmware (SMCCC_ARCH_WORKAROUND_2).'
             URL              = 'https://support.microsoft.com/en-us/topic/kb4072698-windows-server-and-azure-stack-hci-guidance-to-protect-against-silicon-based-microarchitectural-and-speculative-execution-side-channel-vulnerabilities-2f965763-00e2-8f98-b632-0d96f30c8c8e'
         },
         @{
@@ -45,6 +45,22 @@
             RuntimeDetection = $null
             Recommendation   = 'Must be enabled for SSBD to function (x86/x64 only; ARM64 uses firmware-based mitigation)'
             URL              = 'https://nvd.nist.gov/vuln/detail/CVE-2018-3639'
+        },
+        @{
+            Id               = 'MinVmVersion'
+            Name             = 'Hyper-V VM CPU-Based Mitigations'
+            CVE              = 'CVE-2018-3639, CVE-2017-5715'
+            Category         = 'Recommended'
+            RegistryPath     = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Virtualization'
+            RegistryName     = 'MinVmVersionForCpuBasedMitigations'
+            EnabledValue     = '1.0'
+            Description      = 'Exposes CPU-based mitigations to all VM configuration versions on Hyper-V hosts'
+            Impact           = 'Low'
+            Platform         = 'HyperVHost'
+            Architecture     = 'x86'
+            RuntimeDetection = $null
+            Recommendation   = 'Required by Microsoft on Hyper-V hosts (REG_SZ "1.0"). Fully shut down all VMs after applying so the host mitigation is active before the VMs start.'
+            URL              = 'https://support.microsoft.com/en-us/topic/kb4072698-windows-server-and-azure-stack-hci-guidance-to-protect-against-silicon-based-microarchitectural-and-speculative-execution-side-channel-vulnerabilities-2f965763-00e2-8f98-b632-0d96f30c8c8e'
         },
         @{
             Id               = 'BTI'

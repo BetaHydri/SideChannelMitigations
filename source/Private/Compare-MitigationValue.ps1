@@ -29,22 +29,21 @@
     # Special handling for FeatureSettingsOverride
     # This registry value is a bit field with disable and enable flags
     # Per Microsoft KB4072698, recommended values to ENABLE system-wide mitigations:
-    #   0x2048 (8264) = Basic mitigations (TAA, MDS, Spectre, Meltdown, MMIO, SSBD, L1TF)
-    #   0x800000 (8388608) = BHI mitigation (CVE-2022-0001)
-    #   0x802048 (8396872) = Both (Basic + BHI)
-    # Value 0 = Windows decides per-process, NOT system-wide (does NOT enable SSBD system-wide)
-    # Bit 3 (0x8) = Disable SSBD - must be CLEAR for SSBD to be enabled
+    #   0x48 (72)          = Basic mitigations, Hyper-Threading enabled
+    #   0x2048 (8264)      = Basic mitigations, Hyper-Threading disabled variant
+    #   0x800000 (8388608) = BHI mitigation (CVE-2022-0001), combined with the above by OR
+    #   0x4000000          = AMD CVE-2023-20569, combined with the above by OR
+    # Bit 0 (0x1) disables Spectre v2 and bit 1 (0x2) disables Meltdown mitigations - must be CLEAR.
+    # Bit 3 (0x8) enables SSBD system-wide - must be SET. Value 0 leaves it to Windows per process.
+    # Checked bitwise so every documented combination (72, 8264, 0x800048, 0x802048, ...) passes.
     if ($RegistryName -eq 'FeatureSettingsOverride') {
         # If value doesn't exist, mitigations are NOT enabled system-wide
         if ($null -eq $Current) { return $false }
 
-        # Accept ONLY Microsoft recommended values that enable system-wide mitigations
-        $microsoftValues = @(0x2048, 0x800000, 0x802048)
-        if ($microsoftValues -contains $Current) { return $true }
-
-        # Value 0 or other values do NOT enable system-wide, so registry check fails
-        # (Runtime detection will be the authoritative check)
-        return $false
+        $value = [int64]$Current
+        $ssbdEnabled = ($value -band 0x8) -ne 0
+        $nothingDisabled = ($value -band 0x3) -eq 0
+        return ($ssbdEnabled -and $nothingDisabled)
     }
 
     if ($null -eq $Current) { return $false }

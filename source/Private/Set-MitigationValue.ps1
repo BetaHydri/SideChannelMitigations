@@ -43,7 +43,10 @@
 
         # Determine value type
         $valueType = 'DWord'
-        if ($Mitigation.EnabledValue -is [uint64] -or $Mitigation.EnabledValue -gt 0xFFFFFFFF) {
+        if ($Mitigation.EnabledValue -is [string]) {
+            $valueType = 'String'
+        }
+        elseif ($Mitigation.EnabledValue -is [uint64] -or $Mitigation.EnabledValue -gt 0xFFFFFFFF) {
             $valueType = 'QWord'
         }
 

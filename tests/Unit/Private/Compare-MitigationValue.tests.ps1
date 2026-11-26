@@ -38,33 +38,46 @@ Describe 'Compare-MitigationValue' {
     }
 
     Context 'FeatureSettingsOverride special handling' {
-        It 'Should accept 0x2048 (basic mitigations) as enabled' {
-            InModuleScope $script:moduleName {
-                Compare-MitigationValue -Current 0x2048 -Expected 0x802048 -RegistryName 'FeatureSettingsOverride' | Should -BeTrue
+        It 'Should accept <Name> as enabled' -ForEach @(
+            @{ Name = '0x48 (72, Microsoft Assessment value)'; Value = 0x48 }
+            @{ Name = '0x2048 (8264, HT disabled variant)'; Value = 0x2048 }
+            @{ Name = '0x800048 (72 + BHI)'; Value = 0x800048 }
+            @{ Name = '0x802048 (8264 + BHI)'; Value = 0x802048 }
+        ) {
+            InModuleScope $script:moduleName -Parameters @{ Value = $Value } {
+                Compare-MitigationValue -Current $Value -Expected 0x800048 -RegistryName 'FeatureSettingsOverride' | Should -BeTrue
             }
         }
 
-        It 'Should accept 0x802048 (basic+BHI) as enabled' {
+        It 'Should reject 0x800000 (BHI only, SSBD bit missing)' {
             InModuleScope $script:moduleName {
-                Compare-MitigationValue -Current 0x802048 -Expected 0x802048 -RegistryName 'FeatureSettingsOverride' | Should -BeTrue
+                Compare-MitigationValue -Current 0x800000 -Expected 0x800048 -RegistryName 'FeatureSettingsOverride' | Should -BeFalse
             }
         }
 
-        It 'Should accept 0x800000 (BHI only) as enabled' {
+        It 'Should reject value 3 (Spectre/Meltdown mitigations disabled)' {
             InModuleScope $script:moduleName {
-                Compare-MitigationValue -Current 0x800000 -Expected 0x802048 -RegistryName 'FeatureSettingsOverride' | Should -BeTrue
+                Compare-MitigationValue -Current 0x4B -Expected 0x48 -RegistryName 'FeatureSettingsOverride' | Should -BeFalse
             }
         }
 
         It 'Should reject value 0 for FeatureSettingsOverride' {
             InModuleScope $script:moduleName {
-                Compare-MitigationValue -Current 0 -Expected 0x802048 -RegistryName 'FeatureSettingsOverride' | Should -BeFalse
+                Compare-MitigationValue -Current 0 -Expected 0x48 -RegistryName 'FeatureSettingsOverride' | Should -BeFalse
             }
         }
 
         It 'Should reject null for FeatureSettingsOverride' {
             InModuleScope $script:moduleName {
-                Compare-MitigationValue -Current $null -Expected 0x802048 -RegistryName 'FeatureSettingsOverride' | Should -BeFalse
+                Compare-MitigationValue -Current $null -Expected 0x48 -RegistryName 'FeatureSettingsOverride' | Should -BeFalse
+            }
+        }
+    }
+
+    Context 'String registry values' {
+        It 'Should compare REG_SZ values' {
+            InModuleScope $script:moduleName {
+                Compare-MitigationValue -Current '1.0' -Expected '1.0' -RegistryName 'MinVmVersionForCpuBasedMitigations' | Should -BeTrue
             }
         }
     }

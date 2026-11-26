@@ -14,6 +14,8 @@ $script:RuntimeState = @{
     Flags        = @{}
 }
 
+$script:CpuTopologyCache = $null
+
 $script:PlatformInfo = @{
     Type    = 'Unknown'
     Details = @{}

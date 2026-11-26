@@ -51,6 +51,16 @@ Describe 'Get-SideChannelMitigationDefinition' {
             $ssbd = $script:definitions | Where-Object { $_.Id -eq 'SSBD' }
             $ssbd | Should -Not -BeNullOrEmpty
             $ssbd.CVE | Should -Match 'CVE-2018-3639'
+            ($ssbd.EnabledValue -band 0x48) | Should -Be 0x48
+        }
+
+        It 'Should include the Hyper-V MinVmVersionForCpuBasedMitigations setting as REG_SZ' {
+            $minVm = $script:definitions | Where-Object { $_.Id -eq 'MinVmVersion' }
+            $minVm | Should -Not -BeNullOrEmpty
+            $minVm.RegistryName | Should -Be 'MinVmVersionForCpuBasedMitigations'
+            $minVm.EnabledValue | Should -BeOfType [string]
+            $minVm.EnabledValue | Should -Be '1.0'
+            $minVm.Platform | Should -Be 'HyperVHost'
         }
 
         It 'Should include the KVAS mitigation' {

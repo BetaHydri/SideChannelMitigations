@@ -5,6 +5,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `FeatureSettingsOverride` check now accepts every documented Microsoft value
+  bitwise (SSBD bit `0x8` set, bits `0x1`/`0x2` clear): `72` (0x48),
+  `8264` (0x2048) and their BHI combinations (`0x800048`, `0x802048`). Systems
+  configured with `72`, the value the Microsoft Assessment checks for, were
+  previously reported as not protected.
+- `FeatureSettingsOverride = 0x800000` (BHI only) is no longer accepted, as it
+  does not enable SSBD.
+- `Set-MitigationValue` writes string mitigation values as `REG_SZ`.
+
+### Changed
+
+- Recommended `FeatureSettingsOverride` value is now derived from the CPU:
+  `0x48` (72) with Hyper-Threading enabled, `0x2048` (8264) with
+  Hyper-Threading disabled, plus `0x800000` (BHI) on Intel CPUs.
+
+### Added
+
+- `MinVmVersionForCpuBasedMitigations = "1.0"` (REG_SZ) is assessed and applied
+  on Hyper-V hosts, as required by Microsoft KB4072698.
+- Private function `Get-RecommendedFeatureSettingsOverride` with unit tests.
+
 ## [3.5.0] - 2026-04-02
 
 ### Fixed
