@@ -46,49 +46,37 @@ public static extern int NtQuerySystemInformation(
             )
 
             if ($result -eq 0) {
-                # Parse the returned structure (8 bytes: flags + flags2)
-                # Flag definitions aligned with Microsoft SpeculationControl module
+                # Class 201 returns two DWORDs: Flags and Flags2 (decoded per the Microsoft SpeculationControl module)
                 $flags = [System.Runtime.InteropServices.Marshal]::ReadInt32($infoPtr, 0)
-
-                # Extract individual mitigation states from flags (first DWORD)
-                # Based on Microsoft's scf* constants in SpeculationControl.psm1
-                $script:RuntimeState.Flags['KVAShadowRequired'] = ($flags -band 0x01) -ne 0
-                $script:RuntimeState.Flags['KVAShadowEnabled'] = ($flags -band 0x02) -ne 0
-                $script:RuntimeState.Flags['KVAShadowPCIDEnabled'] = ($flags -band 0x04) -ne 0
-                $script:RuntimeState.Flags['RDCLHardwareProtected'] = ($flags -band 0x08) -ne 0  # Meltdown hardware immunity
-                $script:RuntimeState.Flags['BTIEnabled'] = ($flags -band 0x10) -ne 0
-                $script:RuntimeState.Flags['SSBDSystemWide'] = ($flags -band 0x400) -ne 0
-                $script:RuntimeState.Flags['RetpolineEnabled'] = ($flags -band 0x4000) -ne 0
-                $script:RuntimeState.Flags['EnhancedIBRS'] = ($flags -band 0x10000) -ne 0
-                $script:RuntimeState.Flags['MDSHardwareProtected'] = ($flags -band 0x1000000) -ne 0
-                $script:RuntimeState.Flags['MBClearEnabled'] = ($flags -band 0x2000000) -ne 0
-                $script:RuntimeState.Flags['L1DFlushSupported'] = ($flags -band 0x8000000) -ne 0
-
-                # Read flags2 (second DWORD at offset 4) for newer mitigations
+                $flags2 = 0
                 if ($returnLength -gt 4) {
                     $flags2 = [System.Runtime.InteropServices.Marshal]::ReadInt32($infoPtr, 4)
+                }
 
-                    # Extract hardware protection flags (aligned with Microsoft SpeculationControl module)
-                    $script:RuntimeState.Flags['SBDRHardwareProtected'] = ($flags2 -band 0x01) -ne 0
-                    $script:RuntimeState.Flags['FBSDPHardwareProtected'] = ($flags2 -band 0x02) -ne 0
-                    $script:RuntimeState.Flags['PSDPHardwareProtected'] = ($flags2 -band 0x04) -ne 0
-                    $script:RuntimeState.Flags['FBClearEnabled'] = ($flags2 -band 0x08) -ne 0
-                    $script:RuntimeState.Flags['FBClearReported'] = ($flags2 -band 0x10) -ne 0
+                # Kernel VA shadow and L1D flush state come from class 196 (SystemKernelVaShadowInformation)
+                $kvaFlags = 0
+                $hasKvaFlags = $false
+                $kvaReturnLength = 0
+                $kvaResult = $ntApiType::NtQuerySystemInformation(196, $infoPtr, 4, [ref]$kvaReturnLength)
+                if ($kvaResult -eq 0) {
+                    $kvaFlags = [System.Runtime.InteropServices.Marshal]::ReadInt32($infoPtr, 0)
+                    $hasKvaFlags = $true
+                }
 
-                    # AMD and ARM CPUs are hardware immune to these Intel vulnerabilities
-                    try {
-                        $cpu = Get-CimInstance -ClassName Win32_Processor -ErrorAction SilentlyContinue | Select-Object -First 1
-                        $isAmdOrArm = ($cpu.Manufacturer -like '*AMD*') -or ($cpu.Architecture -eq 5) -or ($cpu.Architecture -eq 12)
+                $vendor = ''
+                $isArm = $false
+                try {
+                    $cpu = Get-CimInstance -ClassName Win32_Processor -ErrorAction SilentlyContinue | Select-Object -First 1
+                    $vendor = [string]$cpu.Manufacturer
+                    $isArm = ($cpu.Architecture -eq 5) -or ($cpu.Architecture -eq 12)
+                }
+                catch {
+                    Write-Debug "CPU vendor detection failed: $($_.Exception.Message)"
+                }
 
-                        if ($isAmdOrArm) {
-                            $script:RuntimeState.Flags['SBDRHardwareProtected'] = $true
-                            $script:RuntimeState.Flags['FBSDPHardwareProtected'] = $true
-                            $script:RuntimeState.Flags['PSDPHardwareProtected'] = $true
-                        }
-                    }
-                    catch {
-                        Write-Debug "CPU vendor detection failed: $($_.Exception.Message)"
-                    }
+                $decoded = ConvertFrom-SpeculationControlFlag -Flags $flags -Flags2 $flags2 -KvaFlags $kvaFlags -HasKvaFlags $hasKvaFlags -CpuVendor $vendor -IsArm $isArm
+                foreach ($key in $decoded.Keys) {
+                    $script:RuntimeState.Flags[$key] = $decoded[$key]
                 }
 
                 $script:RuntimeState.APIAvailable = $true

@@ -37,6 +37,7 @@
         }
         'KVAS' {
             if ($script:RuntimeState.Flags['RDCLHardwareProtected']) { return 'Not Needed (HW Immune)' }
+            if ($script:RuntimeState.Flags['KVAShadowRequired'] -eq $false) { return 'Not Needed (HW Immune)' }
             if ($script:RuntimeState.Flags['KVAShadowEnabled']) { return 'Active' }
             return 'Inactive'
         }
