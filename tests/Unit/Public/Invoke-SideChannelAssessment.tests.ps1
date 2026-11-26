@@ -9,6 +9,11 @@ BeforeAll {
     if ($builtModule) {
         Import-Module $builtModule.FullName -Force -ErrorAction Stop
     }
+    else {
+        $sourcePath = Join-Path $projectPath 'source'
+        Get-ChildItem -Path "$sourcePath\Private\*.ps1" -ErrorAction SilentlyContinue | ForEach-Object { . $_.FullName }
+        Get-ChildItem -Path "$sourcePath\Public\*.ps1" -ErrorAction SilentlyContinue | ForEach-Object { . $_.FullName }
+    }
 }
 
 Describe 'Invoke-SideChannelAssessment' -Skip:(-not $builtModule) {
@@ -50,6 +55,19 @@ Describe 'Invoke-SideChannelAssessment' -Skip:(-not $builtModule) {
             $cmd = Get-Command -Name 'Invoke-SideChannelAssessment' -Module $script:moduleName
             $cmd.Parameters.ContainsKey('ShowDetails') | Should -BeTrue
             $cmd.Parameters['ShowDetails'].ParameterType | Should -Be ([switch])
+        }
+    }
+}
+
+Describe 'Invoke-SideChannelAssessment logging' {
+    Context 'Default log path' {
+        It 'Should initialize logging without errors or warnings (Windows PowerShell 5.1 compatible)' {
+            $errors = $null
+            $warnings = $null
+            $null = Invoke-SideChannelAssessment -Mode Assess -ErrorVariable errors -WarningVariable warnings -ErrorAction SilentlyContinue 6>$null
+            # Unrelated detection errors (for example access denied without admin rights) are expected here
+            @($errors | Where-Object { $_.FullyQualifiedErrorId -match 'NamedParameterNotFound|ParameterArgumentValidationErrorNullNotAllowed' }).Count | Should -Be 0
+            @($warnings | Where-Object { $_ -match 'log file' }).Count | Should -Be 0
         }
     }
 }

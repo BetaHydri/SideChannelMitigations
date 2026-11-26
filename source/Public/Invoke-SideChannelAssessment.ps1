@@ -89,7 +89,7 @@
     if ($LogPath) {
         $script:LogPath = Join-Path $LogPath $logFileName
     } else {
-        $logsDir = Join-Path -Path $PSScriptRoot -ChildPath '..' -AdditionalChildPath 'Logs'
+        $logsDir = Join-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ChildPath 'Logs'
         if (-not (Test-Path $logsDir)) {
             $logsDir = Join-Path ([System.IO.Path]::GetTempPath()) 'SideChannelCheck'
         }

@@ -5,6 +5,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `Invoke-SideChannelAssessment` no longer fails to initialize the log file on
+  Windows PowerShell 5.1 (`Join-Path -AdditionalChildPath` exists only in
+  PowerShell 6+). Previously 5.1 printed several errors and the warning
+  "Could not initialize log file" and wrote no log.
+
 ## [3.6.0] - 2026-11-26
 
 ### Fixed
