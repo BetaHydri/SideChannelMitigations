@@ -5,6 +5,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.7.0] - 2026-11-26
+
+### Fixed
+
+- Kernel runtime detection decoded the speculation control flags with wrong
+  bit positions. Kernel VA shadow (Meltdown) and branch target injection state
+  were derived from unrelated bits (`BpbDisabledSystemPolicy`,
+  `SpecCtrlEnumerated`, `SpecCmdEnumerated`), which could report KVAS as
+  "Inactive" on Meltdown-immune CPUs (or as immune/active on affected CPUs) and
+  BTI as active without Windows support enabled. The flags are now decoded as
+  in Microsoft's SpeculationControl module: Class 201 for BTI, SSBD, MDS and
+  Meltdown hardware immunity, and class 196 (kernel VA shadow) for KVAS and L1D
+  flush support. KVAS is reported as "Not Needed (HW Immune)" when the hardware
+  does not require kernel VA shadow.
+- `Invoke-SideChannelAssessment` no longer fails to initialize the log file on
+  Windows PowerShell 5.1 (`Join-Path -AdditionalChildPath` exists only in
+  PowerShell 6+). Previously 5.1 printed several errors and the warning
+  "Could not initialize log file" and wrote no log.
+
 ### Changed
 
 - The recommended `FeatureSettingsOverride` value no longer includes the Branch
@@ -17,13 +36,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Invoke-SideChannelAssessment -IncludeBhiMitigation` adds the BHI bit
   (`0x800000`, CVE-2022-0001) on Intel CPUs, for example `0x800048`. Existing
   values containing the BHI bit are still accepted.
-
-### Fixed
-
-- `Invoke-SideChannelAssessment` no longer fails to initialize the log file on
-  Windows PowerShell 5.1 (`Join-Path -AdditionalChildPath` exists only in
-  PowerShell 6+). Previously 5.1 printed several errors and the warning
-  "Could not initialize log file" and wrote no log.
 
 ## [3.6.0] - 2026-11-26
 
