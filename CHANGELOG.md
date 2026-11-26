@@ -5,6 +5,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The recommended `FeatureSettingsOverride` value no longer includes the Branch
+  History Injection bit by default: `72` (0x48) with Hyper-Threading and `8264`
+  (0x2048) without, the values the Microsoft Assessment checks for. This
+  supersedes the Intel-only BHI addition from 3.6.0.
+
+### Added
+
+- `Invoke-SideChannelAssessment -IncludeBhiMitigation` adds the BHI bit
+  (`0x800000`, CVE-2022-0001) on Intel CPUs, for example `0x800048`. Existing
+  values containing the BHI bit are still accepted.
+
 ### Fixed
 
 - `Invoke-SideChannelAssessment` no longer fails to initialize the log file on

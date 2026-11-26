@@ -7,9 +7,11 @@ function Get-RecommendedFeatureSettingsOverride {
         Builds the value according to Microsoft KB4072698:
           0x48     (72)   = TAA, MDS, Spectre, Meltdown, MMIO, SSBD and L1TF mitigations with Hyper-Threading enabled
           0x2048   (8264) = same mitigations, variant for systems with Hyper-Threading disabled
-          0x800000        = Branch History Injection (CVE-2022-0001), Intel only, combined by bitwise OR
-        Without explicit parameters the CPU vendor and Hyper-Threading state are detected once
-        and cached for the module session.
+          0x800000        = Branch History Injection (CVE-2022-0001), Intel only, opt-in, combined by bitwise OR
+        The default (72 / 8264) is what the Microsoft Assessment checks for. Without explicit parameters
+        the CPU vendor and Hyper-Threading state are detected once and cached for the module session.
+        BHI is added only when requested, either by parameter or by the module-wide
+        Invoke-SideChannelAssessment -IncludeBhiMitigation switch.
 
     .PARAMETER CpuVendor
         CPU manufacturer string (for example GenuineIntel or AuthenticAMD).
@@ -17,8 +19,16 @@ function Get-RecommendedFeatureSettingsOverride {
     .PARAMETER HyperThreadingEnabled
         Whether Hyper-Threading/SMT is active on the system.
 
+    .PARAMETER IncludeBhi
+        Adds the BHI bit (0x800000) on Intel CPUs. Defaults to the module-wide setting.
+
     .EXAMPLE
         Get-RecommendedFeatureSettingsOverride -CpuVendor 'GenuineIntel' -HyperThreadingEnabled $true
+
+        Returns 72 (0x48).
+
+    .EXAMPLE
+        Get-RecommendedFeatureSettingsOverride -CpuVendor 'GenuineIntel' -HyperThreadingEnabled $true -IncludeBhi $true
 
         Returns 8388680 (0x800048).
     #>
@@ -27,8 +37,14 @@ function Get-RecommendedFeatureSettingsOverride {
     param(
         [string]$CpuVendor,
 
-        [bool]$HyperThreadingEnabled
+        [bool]$HyperThreadingEnabled,
+
+        [bool]$IncludeBhi
     )
+
+    if (-not $PSBoundParameters.ContainsKey('IncludeBhi')) {
+        $IncludeBhi = [bool]$script:IncludeBhiMitigation
+    }
 
     if (-not $PSBoundParameters.ContainsKey('CpuVendor') -or -not $PSBoundParameters.ContainsKey('HyperThreadingEnabled')) {
         if (-not $script:CpuTopologyCache) {
@@ -54,7 +70,7 @@ function Get-RecommendedFeatureSettingsOverride {
 
     $value = 0x48
     if (-not $HyperThreadingEnabled) { $value = $value -bor 0x2000 }
-    if ($CpuVendor -match 'Intel') { $value = $value -bor 0x800000 }
+    if ($IncludeBhi -and $CpuVendor -match 'Intel') { $value = $value -bor 0x800000 }
 
     return [int]$value
 }

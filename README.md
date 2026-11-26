@@ -193,6 +193,7 @@ Invoke-SideChannelAssessment -Mode RestoreInteractive
 | `-LogPath` | `string` | Destination **folder** for operation logs. Filename is auto-generated as `SideChannelCheck_<yyyyMMdd_HHmmss>.log` |
 | `-BackupPath` | `string` | Custom backup directory (default: module `Backups/` directory) |
 | `-ConfigPath` | `string` | Custom config directory (default: module `Config/` directory) |
+| `-IncludeBhiMitigation` | `switch` | Adds the Branch History Injection bit (`0x800000`, CVE-2022-0001) to the recommended `FeatureSettingsOverride` on Intel CPUs (e.g. `0x800048`). Default is Microsoft's baseline `72` (Hyper-Threading) / `8264` (no Hyper-Threading), which is also what the Microsoft Assessment checks for |
 
 ### `Export-SideChannelAssessment`
 
@@ -1134,7 +1135,7 @@ Invoke-SideChannelAssessment -ExportPath "C:\Reports"
 **CSV Content Preview:**
 ```csv
 Id;Name;Category;Status;RegistryStatus;RuntimeStatus;ActionNeeded;CVE;Platform;Impact;PrerequisiteFor;CurrentValue;ExpectedValue;Description;Recommendation;RegistryPath;RegistryName;URL
-SSBD;Speculative Store Bypass Disable;Critical;Protected;Enabled;Active;No;CVE-2018-3639;All;Low;-;8396872;8396872;Prevents Speculative Store Bypass (Variant 4) attacks;Intel CPUs: Set to 0x802048 (8396872) for Basic+BHI mitigations. AMD CPUs: Set to 0x2048 (8264) for Basic mitigations;HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management;FeatureSettingsOverride;https://support.microsoft.com/en-us/topic/kb4072698
+SSBD;Speculative Store Bypass Disable;Critical;Protected;Enabled;Active;No;CVE-2018-3639;All;Low;-;72;72;Prevents Speculative Store Bypass (Variant 4) attacks;Hyper-Threading enabled: 72 (0x48), the value the Microsoft Assessment checks for. Hyper-Threading disabled: 8264 (0x2048). Optional BHI on Intel: -IncludeBhiMitigation;HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management;FeatureSettingsOverride;https://support.microsoft.com/en-us/topic/kb4072698
 VBS;Virtualization Based Security;Optional;Protected;Enabled;N/A;No;Kernel Isolation;All;Low;HVCI, Credential Guard;1;1;Hardware-based security isolation using virtualization;Enable for enhanced kernel isolation (requires hardware support);HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard;EnableVirtualizationBasedSecurity;https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/oem-vbs
 UEFI;UEFI Firmware;Prerequisite;Active;N/A;Active;No;Boot Security Prerequisite;All;None;Secure Boot, VBS, HVCI, Credential Guard;True;;UEFI firmware mode (required for Secure Boot and modern security);UEFI mode required for Secure Boot, VBS, and HVCI;HKLM:\SYSTEM\CurrentControlSet\Control\SecureBoot\State;UEFISecureBootEnabled;https://uefi.org/specifications
 ...

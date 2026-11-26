@@ -37,6 +37,13 @@
     .PARAMETER ConfigPath
         Path where configuration files are stored. Defaults to module Config directory.
 
+    .PARAMETER IncludeBhiMitigation
+        Adds the Branch History Injection mitigation bit (CVE-2022-0001, 0x800000) to the recommended
+        FeatureSettingsOverride value on Intel CPUs, for example 0x800048 instead of 72. By default the
+        value matches Microsoft's documented baseline (72 with Hyper-Threading, 8264 without), which is
+        also what the Microsoft Assessment checks for. Existing values that contain the BHI bit are
+        always accepted.
+
     .EXAMPLE
         Invoke-SideChannelAssessment
 
@@ -51,6 +58,11 @@
         Invoke-SideChannelAssessment -ShowDetails -ExportPath 'C:\Reports'
 
         Run detailed assessment and export results as CSV to C:\Reports.
+
+    .EXAMPLE
+        Invoke-SideChannelAssessment -Mode ApplyInteractive -IncludeBhiMitigation
+
+        Apply mitigations and add the Branch History Injection bit on Intel CPUs.
 
     .EXAMPLE
         Invoke-SideChannelAssessment -Mode Revert
@@ -80,8 +92,13 @@
         [string]$BackupPath,
 
         [Parameter()]
-        [string]$ConfigPath
+        [string]$ConfigPath,
+
+        [Parameter()]
+        [switch]$IncludeBhiMitigation
     )
+
+    $script:IncludeBhiMitigation = $IncludeBhiMitigation.IsPresent
 
     # Set module-scoped paths from parameters or defaults
     $logFileName = "SideChannelCheck_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"

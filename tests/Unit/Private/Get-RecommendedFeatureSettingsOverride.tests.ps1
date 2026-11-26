@@ -17,27 +17,40 @@ BeforeAll {
 }
 
 Describe 'Get-RecommendedFeatureSettingsOverride' {
-    It 'Should return 72 for AMD with Hyper-Threading enabled' {
+    It 'Should return 72 for Intel with Hyper-Threading enabled by default (Microsoft Assessment value)' {
         InModuleScope $script:moduleName {
-            Get-RecommendedFeatureSettingsOverride -CpuVendor 'AuthenticAMD' -HyperThreadingEnabled $true | Should -Be 72
+            Get-RecommendedFeatureSettingsOverride -CpuVendor 'GenuineIntel' -HyperThreadingEnabled $true | Should -Be 72
         }
     }
 
-    It 'Should return 8264 for AMD with Hyper-Threading disabled' {
+    It 'Should return 8264 for Intel with Hyper-Threading disabled by default' {
         InModuleScope $script:moduleName {
-            Get-RecommendedFeatureSettingsOverride -CpuVendor 'AuthenticAMD' -HyperThreadingEnabled $false | Should -Be 8264
+            Get-RecommendedFeatureSettingsOverride -CpuVendor 'GenuineIntel' -HyperThreadingEnabled $false | Should -Be 8264
         }
     }
 
-    It 'Should add BHI for Intel with Hyper-Threading enabled' {
+    It 'Should add BHI for Intel when requested' {
         InModuleScope $script:moduleName {
-            Get-RecommendedFeatureSettingsOverride -CpuVendor 'GenuineIntel' -HyperThreadingEnabled $true | Should -Be 0x800048
+            Get-RecommendedFeatureSettingsOverride -CpuVendor 'GenuineIntel' -HyperThreadingEnabled $true -IncludeBhi $true | Should -Be 0x800048
+            Get-RecommendedFeatureSettingsOverride -CpuVendor 'GenuineIntel' -HyperThreadingEnabled $false -IncludeBhi $true | Should -Be 0x802048
         }
     }
 
-    It 'Should add BHI for Intel with Hyper-Threading disabled' {
+    It 'Should not add BHI for AMD even when requested' {
         InModuleScope $script:moduleName {
-            Get-RecommendedFeatureSettingsOverride -CpuVendor 'GenuineIntel' -HyperThreadingEnabled $false | Should -Be 0x802048
+            Get-RecommendedFeatureSettingsOverride -CpuVendor 'AuthenticAMD' -HyperThreadingEnabled $true -IncludeBhi $true | Should -Be 72
+        }
+    }
+
+    It 'Should use the module-wide BHI setting when the parameter is omitted' {
+        InModuleScope $script:moduleName {
+            $script:IncludeBhiMitigation = $true
+            try {
+                Get-RecommendedFeatureSettingsOverride -CpuVendor 'GenuineIntel' -HyperThreadingEnabled $true | Should -Be 0x800048
+            }
+            finally {
+                $script:IncludeBhiMitigation = $false
+            }
         }
     }
 
@@ -55,7 +68,7 @@ Describe 'Get-RecommendedFeatureSettingsOverride' {
                 Mock Get-CimInstance {
                     [PSCustomObject]@{ Manufacturer = 'GenuineIntel'; NumberOfCores = 4; NumberOfLogicalProcessors = 8 }
                 }
-                Get-RecommendedFeatureSettingsOverride | Should -Be 0x800048
+                Get-RecommendedFeatureSettingsOverride | Should -Be 72
             }
         }
 

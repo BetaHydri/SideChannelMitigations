@@ -21,13 +21,13 @@
             Category         = 'Critical'
             RegistryPath     = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management'
             RegistryName     = 'FeatureSettingsOverride'
-            EnabledValue     = (Get-RecommendedFeatureSettingsOverride)  # Microsoft KB4072698: 0x48 (72) HT enabled, 0x2048 (8264) HT disabled; Intel adds BHI 0x800000
+            EnabledValue     = (Get-RecommendedFeatureSettingsOverride)  # Microsoft KB4072698: 0x48 (72) HT enabled, 0x2048 (8264) HT disabled; BHI 0x800000 opt-in on Intel
             Description      = 'Prevents Speculative Store Bypass (Variant 4) attacks'
             Impact           = 'Low'
             Platform         = 'All'
             Architecture     = 'x86'
             RuntimeDetection = 'SSBD'
-            Recommendation   = 'Hyper-Threading enabled: 0x48 (72), as checked by the Microsoft Assessment. Hyper-Threading disabled: 0x2048 (8264). Intel CPUs additionally get BHI (0x800000 via bitwise OR, e.g. 0x800048 = 8388680). Both documented Microsoft values (72, 8264) and their BHI combinations are accepted. Value 0 does NOT enable system-wide. ARM64 CPUs: Not applicable - mitigated via firmware (SMCCC_ARCH_WORKAROUND_2).'
+            Recommendation   = 'Hyper-Threading enabled: 72 (0x48), the value the Microsoft Assessment checks for. Hyper-Threading disabled: 8264 (0x2048). Optional Branch History Injection (CVE-2022-0001) on Intel: use -IncludeBhiMitigation (adds 0x800000, e.g. 0x800048); note the Microsoft Assessment expects exactly 72 or 8264. Values with the BHI bit are accepted. Value 0 does NOT enable system-wide. ARM64: not applicable, mitigated via firmware.'
             URL              = 'https://support.microsoft.com/en-us/topic/kb4072698-windows-server-and-azure-stack-hci-guidance-to-protect-against-silicon-based-microarchitectural-and-speculative-execution-side-channel-vulnerabilities-2f965763-00e2-8f98-b632-0d96f30c8c8e'
         },
         @{

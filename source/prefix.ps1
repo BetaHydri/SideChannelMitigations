@@ -15,6 +15,7 @@ $script:RuntimeState = @{
 }
 
 $script:CpuTopologyCache = $null
+$script:IncludeBhiMitigation = $false
 
 $script:PlatformInfo = @{
     Type    = 'Unknown'
